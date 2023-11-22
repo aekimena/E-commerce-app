@@ -23,12 +23,14 @@ import {
 const MainStack = createNativeStackNavigator();
 
 import Home from './mainScreens/Home';
+import Catalog from './mainScreens/Catalog';
+import Favourites from './Favourites';
 
 import ProductContext from '../context/ProductContext';
 
 const Main = ({navigation}) => {
   const [activeTab, setActiveTab] = useState(1);
-  const {cartItems, drawer, lightMode, setLightMode} =
+  const {cartItems, drawer, lightMode, setLightMode, favouriteItems} =
     useContext(ProductContext);
   const [keyboardStatus, setKeyboardStatus] = useState(false);
   const [settingsClicked, setSettingsClicked] = useState(false);
@@ -146,10 +148,20 @@ const Main = ({navigation}) => {
           {/* <ProductContextProvider> */}
           {/* <Home navigation={navigation} /> */}
 
-          <MainStack.Navigator>
+          <MainStack.Navigator initialRouteName="home">
             <MainStack.Screen
               name="home"
               component={Home}
+              options={{headerShown: false}}
+            />
+            <MainStack.Screen
+              name="catalog"
+              component={Catalog}
+              options={{headerShown: false}}
+            />
+            <MainStack.Screen
+              name="favorites"
+              component={Favourites}
               options={{headerShown: false}}
             />
           </MainStack.Navigator>
@@ -173,11 +185,12 @@ const Main = ({navigation}) => {
                 display: keyboardStatus ? 'none' : 'flex',
                 marginTop: 7,
                 marginBottom: 6,
-                justifyContent: 'space-around',
+                justifyContent: 'space-between',
                 gap: 15,
               },
             ]}>
-            <Pressable onPress={() => handleTapPress(1, null)}>
+            <Pressable
+              onPress={() => handleTapPress(1, navigation.navigate('home'))}>
               <View>
                 <Icon
                   name="house"
@@ -194,14 +207,68 @@ const Main = ({navigation}) => {
                 />
               </View>
             </Pressable>
-            <Pressable onPress={() => handleTapPress(2, null)}>
+            <Pressable
+              onPress={() =>
+                handleTapPress(1, navigation.navigate('favorites'))
+              }>
+              {favouriteItems?.length > 0 && (
+                <View
+                  style={[
+                    t.roundedFull,
+                    t.flex,
+                    t.justifyCenter,
+                    t.itemsCenter,
+                    // t.p3,
+                    {
+                      backgroundColor: '#36346C',
+                      position: 'absolute',
+                      height: 25,
+                      width: 25,
+                      bottom: 15,
+                      left: 15,
+                      zIndex: 10,
+                    },
+                  ]}>
+                  <Text
+                    style={{
+                      color: '#fff',
+                      fontSize: 16,
+                      fontWeight: 'bold',
+                      // padding: 3,
+                    }}>
+                    {favouriteItems.length}
+                  </Text>
+                </View>
+              )}
+
+              <View>
+                <Icon
+                  name="heart"
+                  size={27}
+                  solid={true}
+                  color={
+                    routeName == 'favorites'
+                      ? lightMode
+                        ? '#222'
+                        : '#fff'
+                      : lightMode
+                      ? 'rgba(0, 0, 0, 0.25)'
+                      : 'rgba(255, 255, 255, 0.2)'
+                  }
+                />
+              </View>
+            </Pressable>
+            <Pressable
+              onPress={() => handleTapPress(2, navigation.navigate('catalog'))}>
               <View>
                 <Icon5
                   name="th-large"
                   size={27}
                   color={
-                    route.name == 'category'
-                      ? '#36346C'
+                    routeName == 'catalog'
+                      ? lightMode
+                        ? '#222'
+                        : '#fff'
                       : lightMode
                       ? 'rgba(0, 0, 0, 0.25)'
                       : 'rgba(255, 255, 255, 0.2)'
@@ -222,7 +289,7 @@ const Main = ({navigation}) => {
                       t.itemsCenter,
                       // t.p3,
                       {
-                        backgroundColor: '#f66464',
+                        backgroundColor: '#36346C',
                         position: 'absolute',
                         height: 25,
                         width: 25,

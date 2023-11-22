@@ -32,11 +32,11 @@ function App() {
             component={Cart}
             options={{headerShown: false}}
           />
-          <Stack.Screen
+          {/* <Stack.Screen
             name="favourites"
             component={Favourites}
             options={{headerShown: false}}
-          />
+          /> */}
         </Stack.Navigator>
       </NavigationContainer>
       {/* </GestureHandlerRootView> */}

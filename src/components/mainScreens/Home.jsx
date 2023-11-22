@@ -1,81 +1,68 @@
-import {View, Text, TextInput, ScrollView, Pressable} from 'react-native';
-import React, {useState, useContext, useEffect} from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Pressable,
+  TouchableOpacity,
+  ScrollView,
+  Image,
+  Animated,
+  ImageBackground,
+} from 'react-native';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import {t} from 'react-native-tailwindcss';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import ProductContext from '../../context/ProductContext';
 
-import Products from '../Products';
-
 const Home = ({navigation}) => {
-  const {products, favouriteItems, setFilteredProducts, drawer, lightMode} =
+  const {lightMode, products, drawer, favouriteItems} =
     useContext(ProductContext);
-  const [text, setText] = useState('');
-  const [activeBtn, setActiveBtn] = useState(1);
-  const [activeCategory, setActiveCategory] = useState('All');
+  const changeImageWH = useRef(new Animated.Value(0)).current;
+  const [imgIndex, setImgIndex] = useState(0);
 
-  const handlePress = (id, btnText) => {
-    setActiveBtn(id);
-
-    setActiveCategory(btnText);
-    console.log(btnText);
-  };
-  const renderBtn = (id, btnText) => {
-    // const btnBg = activeBtn === id ? 'rgba(7, 23, 42, 1)' : '#fff';
-    const btnBg =
-      activeBtn === id ? '#36346C' : lightMode ? '#fff' : 'transparent';
-
-    const btnCol = activeBtn === id ? '#fff' : lightMode ? '#222' : '#fff';
-    const bdCol = activeBtn === id ? '#36346c' : lightMode ? '#222' : '#fff';
-
-    return (
-      <Pressable
-        key={id}
-        onPress={() => {
-          handlePress(id, btnText);
-        }}
-        style={[
-          t.roundedFull,
-          t.h12,
-          t.justifyCenter,
-          t.itemsCenter,
-          t.pX8,
-          {
-            backgroundColor: btnBg,
-            borderColor: bdCol,
-            borderWidth: 0.4,
-          },
-        ]}>
-        <Text style={{color: btnCol, fontSize: 18}}>{btnText}</Text>
-      </Pressable>
-    );
-  };
+  const loopAni = Animated.loop(
+    Animated.sequence([
+      Animated.timing(changeImageWH, {
+        toValue: 2,
+        duration: 7000,
+        useNativeDriver: true,
+      }),
+      Animated.timing(changeImageWH, {
+        toValue: 0,
+        duration: 7000,
+        useNativeDriver: true,
+      }),
+    ]),
+  );
 
   useEffect(() => {
-    text.length !== 0 &&
-      setFilteredProducts(
-        products.filter(
-          item => item == item && item.category.indexOf(activeCategory) !== -1,
-        ),
-      );
-    setFilteredProducts(
-      products.filter(
-        item =>
-          item.title.toLowerCase().includes(text.toLowerCase()) &&
-          item.category.indexOf(activeCategory) !== -1,
-      ),
-    );
-  }, [text, activeCategory]);
+    loopAni.start();
+  }, []);
 
+  useEffect(() => {
+    const changeImage = setInterval(() => {
+      setImgIndex(() => (imgIndex > 2 ? 0 : imgIndex + 1));
+    }, 14000);
+
+    return () => clearInterval(changeImage);
+  }, [loopAni]);
+
+  const interpolateWH = changeImageWH.interpolate({
+    inputRange: [0, 1, 2],
+    outputRange: [1, 2, 3],
+  });
   return (
-    <View style={{backgroundColor: lightMode ? '#fff' : '#111', flex: 1}}>
-      <View style={[t.flexCol, t.pX5, t.pY3, t.hAuto, {gap: 20}]}>
+    <View style={{flex: 1, backgroundColor: lightMode ? '#fff' : '#111'}}>
+      <View
+        style={{elevation: 3, backgroundColor: lightMode ? '#fff' : '#111'}}>
         <View
-          style={[
-            t.flexRow,
-            t.justifyBetween,
-            t.itemsCenter,
-            {paddingTop: 10},
-          ]}>
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            paddingHorizontal: 20,
+            paddingVertical: 15,
+          }}>
           <Pressable onPress={() => drawer.current.openDrawer()}>
             <Icon
               name="bars-staggered"
@@ -84,119 +71,98 @@ const Home = ({navigation}) => {
             />
           </Pressable>
 
-          <View style={[t.flex, t.flexRow, {gap: 25}]}>
-            {/* <Icon name="bell" size={30} color={'#07172a'} solid={true} /> */}
-            <Pressable onPress={() => navigation.navigate('favourites')}>
-              {/*  */}
-              {favouriteItems?.length > 0 && (
-                <View
-                  style={[
-                    t.roundedFull,
-                    t.flex,
-                    t.justifyCenter,
-                    t.itemsCenter,
-                    // t.p3,
-                    {
-                      backgroundColor: '#f66464',
-                      position: 'absolute',
-                      height: 25,
-                      width: 25,
-                      bottom: 20,
-                      left: 18,
-                      zIndex: 10,
-                    },
-                  ]}>
-                  <Text
-                    style={{
-                      color: '#fff',
-                      fontSize: 16,
-                      fontWeight: 'bold',
-                      // padding: 3,
-                    }}>
-                    {favouriteItems.length}
-                  </Text>
-                </View>
-              )}
-              {/*  */}
-              <Icon
-                name="heart"
-                size={30}
-                color={lightMode ? '#222' : '#fff'}
-              />
-            </Pressable>
-          </View>
-        </View>
-        <View style={[t.flexRow, t.justifyCenter, t.itemsCenter, t.relative]}>
-          <Icon
-            name="magnifying-glass"
-            size={20}
-            color={lightMode ? '#222' : '#fff'}
-            style={[t.absolute, t.mT10, t.left0, t.mL3, t.z10]}
-          />
-          <View style={[t.flex1]}>
-            <TextInput
-              style={[
-                t.p3,
-                t.relative,
-                {
-                  // backgroundColor: '#E2E7EE',
-                  backgroundColor: lightMode ? 'rgba(0, 0, 0, 0.05)' : '#222',
-                  color: lightMode ? '#222' : '#fff',
-                  paddingLeft: 40,
-                  fontSize: 20,
-                  height: 53,
-                  borderRadius: 10,
-                },
-              ]}
-              placeholder="Search products..."
-              onChangeText={newText => setText(newText)}
-              defaultValue={text}
-              placeholderTextColor={lightMode ? '#222' : '#fff'}
+          <Text style={{color: lightMode ? '#222' : '#fff', fontSize: 25}}>
+            Levon
+          </Text>
+
+          <Pressable>
+            <Icon
+              name="magnifying-glass"
+              size={30}
+              color={lightMode ? '#222' : '#fff'}
             />
-          </View>
-          {/* <View
-            style={[
-              t.flexCol,
-              t.itemsCenter,
-              t.justifyCenter,
-              t.mL3,
-              {backgroundColor: '#E2E7EE', height: 53, borderRadius: 10},
-            ]}>
-            <Icon name="sliders" size={25} color={'#888'} style={[t.p3]} />
-          </View> */}
+          </Pressable>
         </View>
       </View>
-
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <ScrollView
-          contentContainerStyle={[
-            t.flex,
-            t.flexRow,
-            t.justifyEvenly,
-            t.itemsCenter,
-            t.mT2,
-            t.mB5,
-            t.pX5,
-            {gap: 10},
-          ]}
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}>
-          {renderBtn(1, 'All')}
-          {renderBtn(2, 'Shoes')}
-          {renderBtn(3, 'Bags')}
-          {renderBtn(4, 'Tops')}
-          {renderBtn(5, 'Hats')}
-        </ScrollView>
-
-        <View
-          style={{
-            paddingHorizontal: 15,
-            width: '100%',
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            marginBottom: 15,
-          }}>
-          <Products navigation={navigation} />
+      <ScrollView contentContainerStyle={{gap: 10}}>
+        <View style={styles.imageContainer}>
+          <Animated.Image
+            source={products[imgIndex].source}
+            style={[
+              styles.image,
+              {transform: [{scaleX: interpolateWH}, {scaleY: interpolateWH}]},
+            ]}
+            resizeMode="cover"
+          />
+          <View style={styles.abseoluteChild}>
+            <Text style={{color: '#fff', fontSize: 35, fontWeight: 300}}>
+              New Collections
+            </Text>
+            <TouchableOpacity style={styles.imageBtn}>
+              <Text style={styles.imageBtnTxt}>Shop Now</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.layer}></View>
+        </View>
+        {/*  */}
+        <View style={styles.imageContainer}>
+          <Animated.Image
+            source={products[imgIndex].source}
+            style={[
+              styles.image,
+              {transform: [{scaleX: interpolateWH}, {scaleY: interpolateWH}]},
+            ]}
+            resizeMode="cover"
+          />
+          <View style={styles.abseoluteChild}>
+            <Text style={{color: '#fff', fontSize: 35, fontWeight: 300}}>
+              Recommended
+            </Text>
+            <TouchableOpacity style={styles.imageBtn}>
+              <Text style={styles.imageBtnTxt}>Shop Now</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.layer}></View>
+        </View>
+        {/*  */}
+        <View style={styles.imageContainer}>
+          <Animated.Image
+            source={products[imgIndex].source}
+            style={[
+              styles.image,
+              {transform: [{scaleX: interpolateWH}, {scaleY: interpolateWH}]},
+            ]}
+            resizeMode="cover"
+          />
+          <View style={styles.abseoluteChild}>
+            <Text style={{color: '#fff', fontSize: 35, fontWeight: 300}}>
+              Best Sellers
+            </Text>
+            <TouchableOpacity style={styles.imageBtn}>
+              <Text style={styles.imageBtnTxt}>Shop Now</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.layer}></View>
+        </View>
+        {/*  */}
+        <View style={styles.imageContainer}>
+          <Animated.Image
+            source={products[imgIndex].source}
+            style={[
+              styles.image,
+              {transform: [{scaleX: interpolateWH}, {scaleY: interpolateWH}]},
+            ]}
+            resizeMode="cover"
+          />
+          <View style={styles.abseoluteChild}>
+            <Text style={{color: '#fff', fontSize: 35, fontWeight: 300}}>
+              Top Rated
+            </Text>
+            <TouchableOpacity style={styles.imageBtn}>
+              <Text style={styles.imageBtnTxt}>Shop Now</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.layer}></View>
         </View>
       </ScrollView>
     </View>
@@ -204,3 +170,44 @@ const Home = ({navigation}) => {
 };
 
 export default Home;
+
+const styles = StyleSheet.create({
+  imageContainer: {
+    width: '100%',
+    height: 250,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+
+    // flex: 1,
+  },
+  image: {
+    height: '100%',
+    width: '100%',
+    // flex: 1,
+  },
+  abseoluteChild: {
+    alignItems: 'center',
+    gap: 10,
+    position: 'absolute',
+    zIndex: 20,
+  },
+  imageBtn: {
+    backgroundColor: 'transparent',
+    padding: 10,
+    paddingHorizontal: 20,
+    borderColor: '#fff',
+    borderWidth: 1.4,
+  },
+  imageBtnTxt: {
+    fontSize: 20,
+    color: '#fff',
+  },
+
+  layer: {
+    height: '100%',
+    width: '100%',
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    position: 'absolute',
+  },
+});
