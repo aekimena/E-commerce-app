@@ -5,6 +5,7 @@ import {
   Image,
   Pressable,
   StatusBar,
+  ScrollView,
 } from 'react-native';
 import React, {useContext, useState} from 'react';
 import ProductContext from '../../context/ProductContext';
@@ -14,7 +15,57 @@ import {t} from 'react-native-tailwindcss';
 
 const NewCollectionsScreen = ({navigation}) => {
   const [text, setText] = useState('');
-  const {lightMode, newCollections} = useContext(ProductContext);
+  const {
+    lightMode,
+    newCollections,
+    setProductId,
+    handleNewValue,
+    handleNewFavouriteValue,
+  } = useContext(ProductContext);
+  const [activeBtn, setActiveBtn] = useState(1);
+
+  const handlePress = (id, btnText) => {
+    setActiveBtn(id);
+  };
+
+  const renderBtn = (id, btnText) => {
+    // const btnBg = activeBtn === id ? 'rgba(7, 23, 42, 1)' : '#fff';
+    const btnBg = activeBtn === id ? '#36346C' : lightMode ? '#222' : '#fff';
+    const activeIndicator = activeBtn === id ? '#36346c' : 'transparent';
+    const activeFontWeight = activeBtn === id ? 'bold' : 500;
+
+    return (
+      <Pressable
+        key={id}
+        onPress={() => {
+          handlePress(id, btnText);
+        }}
+        style={{
+          paddingHorizontal: 5,
+          alignItems: 'center',
+          gap: 3,
+        }}>
+        <Text
+          style={{color: btnBg, fontSize: 18, fontWeight: activeFontWeight}}>
+          {btnText}
+        </Text>
+        <View
+          style={{
+            width: 5,
+            height: 5,
+            borderRadius: 2.5,
+            backgroundColor: activeIndicator,
+          }}></View>
+      </Pressable>
+    );
+  };
+
+  const handleDisplayProduct = product => {
+    setProductId(product.id);
+    navigation.navigate('ProductDisplay');
+    console.log(product.id);
+  };
+
   return (
     <View style={{backgroundColor: lightMode ? '#fff' : '#111', flex: 1}}>
       <StatusBar
@@ -117,8 +168,66 @@ const NewCollectionsScreen = ({navigation}) => {
       </View>
       <View
         style={{
+          flexDirection: 'row',
+          gap: 10,
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          padding: 20,
+        }}>
+        <View
+          style={{
+            // borderColor: 'rgba(0,0,0,0.5)',
+            // borderWidth: 0.5,
+            borderRadius: 10,
+            borderColor: '#fff',
+            borderWidth: lightMode ? 0 : 0.5,
+            flexDirection: 'row',
+            gap: 10,
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            width: 120,
+            padding: 10,
+            paddingVertical: 5,
+            elevation: lightMode ? 2 : 0,
+            backgroundColor: lightMode ? '#fff' : 'transparent',
+          }}>
+          <Text
+            style={{
+              color: lightMode ? '#222' : '#fff',
+              fontWeight: '500',
+              fontSize: 20,
+            }}>
+            Man
+          </Text>
+          <Icon
+            name="chevron-down"
+            color={lightMode ? '#222' : '#fff'}
+            size={15}
+          />
+        </View>
+      </View>
+      <View style={{alignItems: 'center', marginBottom: 15}}>
+        <ScrollView
+          contentContainerStyle={{
+            gap: 20,
+            flexDirection: 'row',
+            paddingHorizontal: 20,
+          }}
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}>
+          {renderBtn(1, 'All')}
+          {renderBtn(2, 'Shoes')}
+          {renderBtn(3, 'Bags')}
+          {renderBtn(4, 'Tops')}
+          {renderBtn(5, 'Trousers')}
+          {renderBtn(6, 'Hats')}
+        </ScrollView>
+      </View>
+
+      <View
+        style={{
           paddingHorizontal: 15,
-          paddingVertical: 30,
+          // paddingVertical: 30,
           width: '100%',
           flexDirection: 'row',
           flexWrap: 'wrap',
@@ -133,7 +242,7 @@ const NewCollectionsScreen = ({navigation}) => {
               marginBottom: 5,
             }}
             key={product.id}
-            onPress={() => null}>
+            onPress={() => handleDisplayProduct(product)}>
             <View style={{padding: 5}}>
               <Image
                 source={product.source}

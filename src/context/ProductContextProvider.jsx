@@ -36,6 +36,11 @@ const ProductContextProvider = ({children}) => {
         item.id === id ? {...item, addedToCart: newValue} : item,
       ),
     );
+    setNewCollections(prevData =>
+      prevData.map(item =>
+        item.id === id ? {...item, addedToCart: newValue} : item,
+      ),
+    );
 
     newValue
       ? setCartItems([...cartItems, newCartItem])
@@ -57,6 +62,11 @@ const ProductContextProvider = ({children}) => {
       ),
     );
     setFilteredProducts(prevData =>
+      prevData.map(item =>
+        item.id === id ? {...item, favorite: newValue} : item,
+      ),
+    );
+    setNewCollections(prevData =>
       prevData.map(item =>
         item.id === id ? {...item, favorite: newValue} : item,
       ),

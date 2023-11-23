@@ -74,14 +74,16 @@ const ProductDisplay = ({navigation}) => {
   };
   return (
     <SafeAreaView style={[t.hFull, {backgroundColor: '#E2E7EE', flex: 1}]}>
-      <StatusBar backgroundColor="#E2E7EE" />
-      <View style={{flex: 1, backgroundColor: '#E2E7EE'}}>
+      <StatusBar
+        backgroundColor="transparent"
+        translucent={true}
+        barStyle={lightMode ? 'dark-content' : 'light-content'}
+      />
+      <View style={{flex: 1}}>
         <View style={styles.topBtns}>
-          <Pressable
-            style={{zIndex: 20}}
-            onPress={() => navigation.navigate('home')}>
-            <View style={[styles.topBtn, {backgroundColor: '#36346C'}]}>
-              <Icon name="chevron-left" color="#fff" size={20} />
+          <Pressable style={{zIndex: 20}} onPress={() => navigation.goBack()}>
+            <View style={styles.topBtn}>
+              <Icon name="chevron-left" color="#222" size={25} />
             </View>
           </Pressable>
           <View>
@@ -94,15 +96,11 @@ const ProductDisplay = ({navigation}) => {
                   productIndex,
                 )
               }>
-              <View
-                style={[
-                  styles.topBtn,
-                  {backgroundColor: '#fff', height: 55, width: 55},
-                ]}>
+              <View style={styles.topBtn}>
                 <Icon
                   name="heart"
-                  size={20}
-                  color={productIndex.favorite ? '#f66464' : '#36346c'}
+                  size={25}
+                  color={productIndex.favorite ? '#f66464' : '#222'}
                   solid={productIndex.favorite ? true : false}
                 />
               </View>
@@ -114,18 +112,27 @@ const ProductDisplay = ({navigation}) => {
           resizeMode="cover"
           style={{
             flex: 1,
-            width: '90%',
+            width: '100%',
             height: '100%',
             alignSelf: 'center',
           }}
         />
+        <Text
+          style={{
+            position: 'absolute',
+            zIndex: 20,
+            fontSize: 50,
+            bottom: 0,
+            alignSelf: 'center',
+          }}>
+          Rating
+        </Text>
       </View>
 
       <View
         style={{
           flex: 1,
-          borderTopLeftRadius: 35,
-          borderTopRightRadius: 35,
+
           backgroundColor: lightMode ? '#fff' : '#111',
           // alignItems: 'center',
         }}>
@@ -266,18 +273,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     // padding: 30,
-    paddingVertical: 15,
+    marginTop: 50,
     paddingHorizontal: 20,
     position: 'absolute',
     width: '100%',
   },
-  topBtn: [
-    t.roundedFull,
-    t.flex,
-    t.justifyCenter,
-    t.itemsCenter,
-    {backgroundColor: '#07172a', height: 55, width: 55},
-  ],
+
+  topBtn: {
+    // backgroundColor: 'rgba(52,52,108,0.3)',
+    // backgroundColor: 'rgba(0,0,0,0.1)',
+    backgroundColor: '#fff',
+    height: 60,
+    width: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 3,
+  },
+
   detailsFlexRow: [
     t.flex,
     t.flexRow,
