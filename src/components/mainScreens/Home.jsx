@@ -15,8 +15,14 @@ import Icon from 'react-native-vector-icons/FontAwesome6';
 import ProductContext from '../../context/ProductContext';
 
 const Home = ({navigation}) => {
-  const {lightMode, products, drawer, favouriteItems} =
-    useContext(ProductContext);
+  const {
+    lightMode,
+    products,
+    drawer,
+    favouriteItems,
+    newCollections,
+    setNewCollections,
+  } = useContext(ProductContext);
   const changeImageWH = useRef(new Animated.Value(0)).current;
   const [imgIndex, setImgIndex] = useState(0);
 
@@ -24,6 +30,7 @@ const Home = ({navigation}) => {
     Animated.sequence([
       Animated.timing(changeImageWH, {
         toValue: 2,
+        // delay: 2000,
         duration: 7000,
         useNativeDriver: true,
       }),
@@ -42,7 +49,7 @@ const Home = ({navigation}) => {
   useEffect(() => {
     const changeImage = setInterval(() => {
       setImgIndex(() => (imgIndex > 2 ? 0 : imgIndex + 1));
-    }, 14000);
+    }, 7000);
 
     return () => clearInterval(changeImage);
   }, [loopAni]);
@@ -87,7 +94,7 @@ const Home = ({navigation}) => {
       <ScrollView contentContainerStyle={{gap: 10}}>
         <View style={styles.imageContainer}>
           <Animated.Image
-            source={products[imgIndex].source}
+            source={newCollections[imgIndex].source}
             style={[
               styles.image,
               {transform: [{scaleX: interpolateWH}, {scaleY: interpolateWH}]},
@@ -98,7 +105,9 @@ const Home = ({navigation}) => {
             <Text style={{color: '#fff', fontSize: 35, fontWeight: 300}}>
               New Collections
             </Text>
-            <TouchableOpacity style={styles.imageBtn}>
+            <TouchableOpacity
+              style={styles.imageBtn}
+              onPress={() => navigation.navigate('newCollections')}>
               <Text style={styles.imageBtnTxt}>Shop Now</Text>
             </TouchableOpacity>
           </View>
@@ -107,7 +116,7 @@ const Home = ({navigation}) => {
         {/*  */}
         <View style={styles.imageContainer}>
           <Animated.Image
-            source={products[imgIndex].source}
+            source={newCollections[imgIndex + 3].source}
             style={[
               styles.image,
               {transform: [{scaleX: interpolateWH}, {scaleY: interpolateWH}]},
@@ -127,7 +136,7 @@ const Home = ({navigation}) => {
         {/*  */}
         <View style={styles.imageContainer}>
           <Animated.Image
-            source={products[imgIndex].source}
+            source={newCollections[imgIndex + 6].source}
             style={[
               styles.image,
               {transform: [{scaleX: interpolateWH}, {scaleY: interpolateWH}]},
@@ -207,7 +216,7 @@ const styles = StyleSheet.create({
   layer: {
     height: '100%',
     width: '100%',
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
     position: 'absolute',
   },
 });

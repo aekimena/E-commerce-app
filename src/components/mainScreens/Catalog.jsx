@@ -1,4 +1,11 @@
-import {View, Text, TextInput, ScrollView, Pressable} from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  ScrollView,
+  Pressable,
+  StatusBar,
+} from 'react-native';
 import React, {useState, useContext, useEffect} from 'react';
 import {t} from 'react-native-tailwindcss';
 import Icon from 'react-native-vector-icons/FontAwesome6';
@@ -68,6 +75,13 @@ const Home = ({navigation}) => {
 
   return (
     <View style={{backgroundColor: lightMode ? '#fff' : '#111', flex: 1}}>
+      <StatusBar
+        backgroundColor={lightMode ? '#fff' : '#111'}
+        // backgroundColor={'transparent'}
+        barStyle={lightMode ? 'dark-content' : 'light-content'}
+        animated={true}
+        // translucent={true}
+      />
       <View style={[t.flexCol, t.pX5, t.pY3, t.hAuto, {gap: 10}]}>
         <View style={{alignItems: 'center'}}>
           <Text style={{fontSize: 25, color: lightMode ? '#222' : '#fff'}}>
@@ -133,7 +147,8 @@ const Home = ({navigation}) => {
           {renderBtn(2, 'Shoes')}
           {renderBtn(3, 'Bags')}
           {renderBtn(4, 'Tops')}
-          {renderBtn(5, 'Hats')}
+          {renderBtn(5, 'Trousers')}
+          {renderBtn(6, 'Hats')}
         </ScrollView>
 
         <View

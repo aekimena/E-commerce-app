@@ -27,6 +27,7 @@ import Catalog from './mainScreens/Catalog';
 import Favourites from './Favourites';
 
 import ProductContext from '../context/ProductContext';
+import NewCollectionsScreen from './mainScreens/NewCollectionsScreen';
 
 const Main = ({navigation}) => {
   const [activeTab, setActiveTab] = useState(1);
@@ -130,8 +131,10 @@ const Main = ({navigation}) => {
       style={[t.hFull, {backgroundColor: lightMode ? '#fff' : '#111'}]}>
       <StatusBar
         backgroundColor={lightMode ? '#fff' : '#111'}
+        // backgroundColor={'transparent'}
         barStyle={lightMode ? 'dark-content' : 'light-content'}
         animated={true}
+        // translucent={true}
       />
       <DrawerLayout
         ref={drawer}
@@ -162,6 +165,11 @@ const Main = ({navigation}) => {
             <MainStack.Screen
               name="favorites"
               component={Favourites}
+              options={{headerShown: false}}
+            />
+            <MainStack.Screen
+              name="newCollections"
+              component={NewCollectionsScreen}
               options={{headerShown: false}}
             />
           </MainStack.Navigator>
@@ -196,58 +204,7 @@ const Main = ({navigation}) => {
                   name="house"
                   size={27}
                   color={
-                    routeName == 'home'
-                      ? lightMode
-                        ? '#222'
-                        : '#fff'
-                      : lightMode
-                      ? 'rgba(0, 0, 0, 0.25)'
-                      : 'rgba(255, 255, 255, 0.2)'
-                  }
-                />
-              </View>
-            </Pressable>
-            <Pressable
-              onPress={() =>
-                handleTapPress(1, navigation.navigate('favorites'))
-              }>
-              {favouriteItems?.length > 0 && (
-                <View
-                  style={[
-                    t.roundedFull,
-                    t.flex,
-                    t.justifyCenter,
-                    t.itemsCenter,
-                    // t.p3,
-                    {
-                      backgroundColor: '#36346C',
-                      position: 'absolute',
-                      height: 25,
-                      width: 25,
-                      bottom: 15,
-                      left: 15,
-                      zIndex: 10,
-                    },
-                  ]}>
-                  <Text
-                    style={{
-                      color: '#fff',
-                      fontSize: 16,
-                      fontWeight: 'bold',
-                      // padding: 3,
-                    }}>
-                    {favouriteItems.length}
-                  </Text>
-                </View>
-              )}
-
-              <View>
-                <Icon
-                  name="heart"
-                  size={27}
-                  solid={true}
-                  color={
-                    routeName == 'favorites'
+                    routeName == 'home' || 'newCollections'
                       ? lightMode
                         ? '#222'
                         : '#fff'
@@ -276,52 +233,81 @@ const Main = ({navigation}) => {
                 />
               </View>
             </Pressable>
-
             <Pressable
-              onPress={() => handleTapPress(3, navigation.navigate('cart'))}>
+              onPress={() =>
+                handleTapPress(1, navigation.navigate('favorites'))
+              }
+              style={{alignItems: 'center', justifyContent: 'center'}}>
+              {favouriteItems?.length > 0 && (
+                <View
+                  style={[
+                    t.roundedFull,
+                    t.flex,
+                    t.justifyCenter,
+                    t.itemsCenter,
+                    // t.p3,
+                    {
+                      backgroundColor: '#36346C',
+                      position: 'absolute',
+                      height: 8,
+                      width: 8,
+                      top: -8.5,
+                      right: -5,
+                    },
+                  ]}></View>
+              )}
+
               <View>
-                {cartItems?.length > 0 && (
-                  <View
-                    style={[
-                      t.roundedFull,
-                      t.flex,
-                      t.justifyCenter,
-                      t.itemsCenter,
-                      // t.p3,
-                      {
-                        backgroundColor: '#36346C',
-                        position: 'absolute',
-                        height: 25,
-                        width: 25,
-                        bottom: 15,
-                        left: 15,
-                        zIndex: 10,
-                      },
-                    ]}>
-                    <Text
-                      style={{
-                        color: '#fff',
-                        fontSize: 16,
-                        fontWeight: 'bold',
-                        // padding: 3,
-                      }}>
-                      {cartItems.length}
-                    </Text>
-                  </View>
-                )}
                 <Icon
-                  name="bag-shopping"
+                  name="heart"
                   size={27}
+                  solid={true}
                   color={
-                    route.name == 'cart'
-                      ? '#36346C'
+                    routeName == 'favorites'
+                      ? lightMode
+                        ? '#222'
+                        : '#fff'
                       : lightMode
                       ? 'rgba(0, 0, 0, 0.25)'
                       : 'rgba(255, 255, 255, 0.2)'
                   }
-                  solid={true}
                 />
               </View>
+            </Pressable>
+
+            <Pressable
+              onPress={() => handleTapPress(3, navigation.navigate('cart'))}
+              style={{alignItems: 'center', justifyContent: 'center'}}>
+              {cartItems?.length > 0 && (
+                <View
+                  style={[
+                    t.roundedFull,
+                    t.flex,
+                    t.justifyCenter,
+                    t.itemsCenter,
+                    // t.p3,
+                    {
+                      backgroundColor: '#36346C',
+                      position: 'absolute',
+                      height: 8,
+                      width: 8,
+                      top: -8.5,
+                      right: -5,
+                    },
+                  ]}></View>
+              )}
+              <Icon
+                name="bag-shopping"
+                size={27}
+                color={
+                  route.name == 'cart'
+                    ? '#36346C'
+                    : lightMode
+                    ? 'rgba(0, 0, 0, 0.25)'
+                    : 'rgba(255, 255, 255, 0.2)'
+                }
+                solid={true}
+              />
             </Pressable>
 
             <Pressable onPress={() => handleTapPress(4)}>

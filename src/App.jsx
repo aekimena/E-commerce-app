@@ -7,7 +7,7 @@ import Cart from './components/Cart';
 import ProductDisplay from './components/ProductDisplay';
 import ProductContextProvider from './context/ProductContextProvider';
 import Favourites from './components/Favourites';
-
+import Home from './components/mainScreens/Home';
 const Stack = createNativeStackNavigator();
 function App() {
   return (
