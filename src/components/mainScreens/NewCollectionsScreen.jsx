@@ -126,7 +126,7 @@ const NewCollectionsScreen = ({navigation}) => {
                     borderRadius: 10,
                   },
                 ]}
-                placeholder="Search products..."
+                placeholder="Search..."
                 onChangeText={newText => setText(newText)}
                 defaultValue={text}
                 placeholderTextColor={'#fff'}
