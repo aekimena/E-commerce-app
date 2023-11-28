@@ -13,25 +13,29 @@ import React, {useState, useContext, useCallback, useMemo, useRef} from 'react';
 import {t} from 'react-native-tailwindcss';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import ProductContext from '../context/ProductContext';
+import StarRating from 'react-native-star-rating';
 // import {ScrollView} from 'react-native-gesture-handler';
 
 const ProductDisplay = ({navigation}) => {
   const {
     productId,
-    products,
-    handleNewValue,
+    allProducts,
+    cartUpdate,
     handleNewFavouriteValue,
-    lightMode,
+    theme,
+    newRating,
+    cartItems,
   } = useContext(ProductContext);
 
   const productIndex =
-    products[products.findIndex(obj => obj.id === productId)];
+    allProducts[allProducts.findIndex(obj => obj.id === productId)];
   const [activeBtn, setActiveBtn] = useState(1);
   const handlePress = id => {
     setActiveBtn(id);
   };
 
   const [activeSizeBtn, setActiveSizeBtn] = useState(1);
+  // const [starCount, setStarCount] = useState(0);
   const handleSizeBtnPress = id => {
     setActiveSizeBtn(id);
   };
@@ -72,18 +76,22 @@ const ProductDisplay = ({navigation}) => {
       </View>
     );
   };
+
+  const ratingChange = (id, rating) => {
+    newRating(id, rating);
+  };
   return (
     <SafeAreaView style={[t.hFull, {backgroundColor: '#E2E7EE', flex: 1}]}>
       <StatusBar
         backgroundColor="transparent"
         translucent={true}
-        barStyle={lightMode ? 'dark-content' : 'light-content'}
+        barStyle={'light-content'}
       />
       <View style={{flex: 1}}>
         <View style={styles.topBtns}>
           <Pressable style={{zIndex: 20}} onPress={() => navigation.goBack()}>
             <View style={styles.topBtn}>
-              <Icon name="chevron-left" color="#222" size={25} />
+              <Icon name="chevron-left" color="#fff" size={30} />
             </View>
           </Pressable>
           <View>
@@ -92,23 +100,23 @@ const ProductDisplay = ({navigation}) => {
               onPress={() =>
                 handleNewFavouriteValue(
                   productId,
-                  productIndex.favorite ? false : true,
+                  productIndex.liked ? false : true,
                   productIndex,
                 )
               }>
               <View style={styles.topBtn}>
                 <Icon
                   name="heart"
-                  size={25}
-                  color={productIndex.favorite ? '#f66464' : '#222'}
-                  solid={productIndex.favorite ? true : false}
+                  size={30}
+                  color={productIndex.liked ? '#f66464' : '#fff'}
+                  solid={productIndex.liked ? true : false}
                 />
               </View>
             </Pressable>
           </View>
         </View>
         <ImageBackground
-          source={productIndex.source}
+          source={productIndex.imageSource}
           resizeMode="cover"
           style={{
             flex: 1,
@@ -117,23 +125,44 @@ const ProductDisplay = ({navigation}) => {
             alignSelf: 'center',
           }}
         />
-        <Text
+        <View
           style={{
             position: 'absolute',
             zIndex: 20,
-            fontSize: 50,
+            padding: 5,
             bottom: 0,
+            flexDirection: 'row',
+            alignItems: 'flex-end',
+            gap: 10,
             alignSelf: 'center',
           }}>
-          Rating
-        </Text>
+          <StarRating
+            disabled={false}
+            maxStars={5}
+            rating={productIndex.rating}
+            selectedStar={rating => ratingChange(productIndex.id, rating)}
+            fullStarColor={'#ffe169'}
+            emptyStarColor={'#fff'}
+            buttonStyle={{margin: 5, marginBottom: 0}}
+          />
+          <Text style={{color: '#fff', fontSize: 20, fontWeight: 'bold'}}>
+            3.2/5
+          </Text>
+        </View>
+        <View
+          style={{
+            position: 'absolute',
+            height: '100%',
+            width: '100%',
+            backgroundColor: 'rgba(0,0,0,0.2)',
+          }}></View>
       </View>
 
       <View
         style={{
           flex: 1,
 
-          backgroundColor: lightMode ? '#fff' : '#111',
+          backgroundColor: theme == 'light' ? '#fff' : '#111',
           // alignItems: 'center',
         }}>
         <View
@@ -153,18 +182,19 @@ const ProductDisplay = ({navigation}) => {
                 <Text
                   style={{
                     fontSize: 27,
-                    color: lightMode ? '#222' : '#fff',
-                    fontWeight: 500,
+                    color: theme == 'light' ? '#222' : '#fff',
+                    fontWeight: 'bold',
                   }}>
                   {productIndex.title}
                 </Text>
                 <Text
                   style={{
                     fontSize: 25,
-                    color: lightMode ? '#222' : '#fff',
+                    color: theme == 'light' ? '#555' : '#fff',
                     fontWeight: 400,
                   }}>
-                  ${productIndex.price.toFixed(2)}
+                  <Icon name="naira-sign" size={20} />
+                  {productIndex.price.toFixed(2)}
                 </Text>
 
                 <View style={t.mT1}>
@@ -180,7 +210,7 @@ const ProductDisplay = ({navigation}) => {
                   <Text
                     style={{
                       fontSize: 20,
-                      color: lightMode ? '#222' : '#fff',
+                      color: theme == 'light' ? '#222' : '#fff',
                       fontWeight: 500,
                     }}>
                     Description
@@ -188,7 +218,7 @@ const ProductDisplay = ({navigation}) => {
                   <Text
                     style={{
                       fontSize: 17,
-                      color: lightMode ? '#222' : '#fff',
+                      color: theme == 'light' ? '#222' : '#fff',
                       fontWeight: 400,
                     }}>
                     {productIndex.description}
@@ -216,22 +246,25 @@ const ProductDisplay = ({navigation}) => {
             width: '100%',
           }}
           onPress={() =>
-            handleNewValue(
-              productId,
-              productIndex.addedToCart ? false : true,
+            cartUpdate(
+              cartItems.includes(productIndex.id) ? false : true,
               productIndex,
             )
           }>
           <View style={[styles.addToCartBtn, {backgroundColor: '#36346C'}]}>
             <View style={styles.addToCartBtnFlexRow}>
               <Icon
-                name={productIndex.addedToCart ? 'check' : 'bag-shopping'}
+                name={
+                  cartItems.includes(productIndex.id) ? 'check' : 'bag-shopping'
+                }
                 size={25}
                 color="#fff"
                 solid={true}
               />
               <Text style={{color: '#fff', fontSize: 20}}>
-                {productIndex.addedToCart ? 'Added to cart' : 'Add to cart'}
+                {cartItems.includes(productIndex.id)
+                  ? 'Added to cart'
+                  : 'Add to cart'}
               </Text>
             </View>
           </View>
@@ -282,13 +315,13 @@ const styles = StyleSheet.create({
   topBtn: {
     // backgroundColor: 'rgba(52,52,108,0.3)',
     // backgroundColor: 'rgba(0,0,0,0.1)',
-    backgroundColor: '#fff',
+    // backgroundColor: '#fff',
     height: 60,
     width: 60,
     borderRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 3,
+    // elevation: 3,
   },
 
   detailsFlexRow: [

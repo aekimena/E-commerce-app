@@ -7,6 +7,7 @@ import {
   Pressable,
   Image,
   ScrollView,
+  StatusBar,
 } from 'react-native';
 import React, {useState, useContext} from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome6';
@@ -16,12 +17,12 @@ import ProductContext from '../context/ProductContext';
 const Favourites = ({navigation}) => {
   const {
     productId,
-    products,
+    allProducts,
     setProductId,
-    handleNewValue,
+    cartUpdate,
     handleNewFavouriteValue,
     favouriteItems,
-    lightMode,
+    theme,
   } = useContext(ProductContext);
   const [text, setText] = useState('');
 
@@ -34,9 +35,14 @@ const Favourites = ({navigation}) => {
     <SafeAreaView
       style={{
         flex: 1,
-        backgroundColor: lightMode ? '#fff' : '#111',
-        // paddingHorizontal: 20,
+        backgroundColor: theme == 'light' ? '#fff' : '#111',
       }}>
+      <StatusBar
+        backgroundColor={theme == 'light' ? '#fff' : '#111'}
+        barStyle={theme == 'light' ? 'dark-content' : 'light-content'}
+        animated={true}
+        translucent={false}
+      />
       <View
         style={{
           flexDirection: 'row',
@@ -50,7 +56,7 @@ const Favourites = ({navigation}) => {
           <Icon
             name="arrow-left"
             size={30}
-            color={lightMode ? '#222' : '#fff'}
+            color={theme == 'light' ? '#222' : '#fff'}
           />
         </Pressable>
         <View
@@ -64,7 +70,7 @@ const Favourites = ({navigation}) => {
           <Icon
             name="magnifying-glass"
             size={20}
-            color={lightMode ? '#222' : '#fff'}
+            color={theme == 'light' ? '#222' : '#fff'}
             style={{
               position: 'absolute',
               marginTop: 10,
@@ -79,8 +85,9 @@ const Favourites = ({navigation}) => {
                 t.p3,
                 t.relative,
                 {
-                  backgroundColor: lightMode ? 'rgba(0, 0, 0, 0.05)' : '#222',
-                  color: lightMode ? '#222' : '#fff',
+                  backgroundColor:
+                    theme == 'light' ? 'rgba(0, 0, 0, 0.05)' : '#222',
+                  color: theme == 'light' ? '#222' : '#fff',
                   paddingLeft: 40,
                   fontSize: 20,
                   height: 53,
@@ -90,7 +97,7 @@ const Favourites = ({navigation}) => {
               placeholder="Search favourites..."
               onChangeText={newText => setText(newText)}
               defaultValue={text}
-              placeholderTextColor={lightMode ? '#222' : '#fff'}
+              placeholderTextColor={theme == 'light' ? '#222' : '#fff'}
             />
           </View>
         </View>
@@ -110,8 +117,6 @@ const Favourites = ({navigation}) => {
               <Pressable
                 style={{
                   width: '50%',
-                  // height: '100%',
-                  // margin: 3,
 
                   marginBottom: 5,
                 }}
@@ -119,9 +124,7 @@ const Favourites = ({navigation}) => {
                 onPress={() => handleDisplayProduct(item)}>
                 <View style={{padding: 5}}>
                   <Image
-                    // source={{uri: product.image}}
                     source={item.source}
-                    // style={[t.wFull, t.h100, t.roundedTLg]}
                     style={{
                       width: '100%',
                       height: 200,
@@ -132,73 +135,53 @@ const Favourites = ({navigation}) => {
                   />
 
                   <Pressable
-                    style={[
-                      t.absolute,
-                      t.top2,
-                      t.right0,
-
-                      t.h8,
-                      t.w8,
-                      t.m3,
-                      t.roundedFull,
-                      t.itemsCenter,
-                      t.justifyCenter,
-                      t.flexCol,
-                      {backgroundColor: '#f7fafc'},
-                    ]}
+                    style={[styles.addLikeBg, {right: 0}]}
                     onPress={() =>
                       handleNewFavouriteValue(item.id, false, item)
                     }>
                     <Icon
                       name="heart"
                       size={20}
-                      // color={item.favorite ? '#ff2525' : '#07172a'}
                       color={
-                        products[products.findIndex(obj => obj.id === item.id)]
-                          .favorite
+                        allProducts[
+                          allProducts.findIndex(obj => obj.id === item.id)
+                        ].liked
                           ? 'rgba(255, 37, 37, 0.6)'
-                          : '#07172a'
+                          : '#fff'
                       }
                       solid={
-                        products[products.findIndex(obj => obj.id === item.id)]
-                          .favorite
+                        allProducts[
+                          allProducts.findIndex(obj => obj.id === item.id)
+                        ].liked
                           ? true
                           : false
                       }
                     />
                   </Pressable>
                   <Pressable
-                    style={[
-                      t.absolute,
-                      t.top0,
-                      t.left0,
-
-                      t.h8,
-                      t.w8,
-                      t.m3,
-                      t.roundedFull,
-                      t.itemsCenter,
-                      t.justifyCenter,
-                      t.flexCol,
-                      {backgroundColor: '#fff'},
-                    ]}
+                    style={[styles.addLikeBg, {left: 0}]}
                     onPress={() =>
-                      handleNewValue(
+                      cartUpdate(
                         item.id,
-                        item.addedToCart ? false : true,
+                        allProducts[
+                          allProducts.findIndex(obj => obj.id === item.id)
+                        ].addedToCart
+                          ? false
+                          : true,
                         item,
                       )
                     }>
                     <Icon
                       name={
-                        products[products.findIndex(obj => obj.id === item.id)]
-                          .addedToCart
+                        allProducts[
+                          allProducts.findIndex(obj => obj.id === item.id)
+                        ].addedToCart
                           ? 'check'
                           : 'plus'
                       }
                       size={20}
                       // color={'#FF8119'}
-                      color={'#07172a'}
+                      color={'#fff'}
                       solid={false}
                     />
                   </Pressable>
@@ -211,21 +194,25 @@ const Favourites = ({navigation}) => {
                       t.roundedBLg,
                       t.shadowMd,
                       {
-                        backgroundColor: lightMode ? '#fff' : '#222',
-                        height: 90,
+                        backgroundColor: theme == 'light' ? '#fff' : '#222',
+                        height: 'auto',
+                        gap: 10,
                         elevation: 1,
                       },
                       // t.itemsCenter,
                     ]}>
                     <Text
-                      style={{color: lightMode ? '#222' : '#fff', fontSize: 18}}
-                      numberOfLines={2}
+                      style={{
+                        color: theme == 'light' ? '#222' : '#fff',
+                        fontSize: 18,
+                      }}
+                      numberOfLines={1}
                       lineBreakMode="tail">
                       {item.title}
                     </Text>
                     <Text
                       style={{
-                        color: lightMode ? '#222' : '#fff',
+                        color: theme == 'light' ? '#222' : '#fff',
                         fontSize: 17,
                       }}>
                       ${item.price.toFixed(2)}
@@ -261,5 +248,17 @@ const styles = StyleSheet.create({
     borderColor: '#07172a',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  addLikeBg: {
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    position: 'absolute',
+    top: 2,
+    right: 0,
+    height: 30,
+    width: 30,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: 10,
   },
 });

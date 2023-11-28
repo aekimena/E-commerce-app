@@ -23,22 +23,23 @@ import {
 const MainStack = createNativeStackNavigator();
 
 import Home from './mainScreens/Home';
-import Catalog from './mainScreens/Catalog';
+// import Catalog from './mainScreens/Catalog';
 import Favourites from './Favourites';
 
 import ProductContext from '../context/ProductContext';
 import NewCollectionsScreen from './mainScreens/NewCollectionsScreen';
+import SearchScreen from './mainScreens/SearchScreen';
 
 const Main = ({navigation}) => {
   const [activeTab, setActiveTab] = useState(1);
-  const {cartItems, drawer, lightMode, setLightMode, favouriteItems} =
+  const {cartItems, drawer, theme, favouriteItems, toggleTheme} =
     useContext(ProductContext);
   const [keyboardStatus, setKeyboardStatus] = useState(false);
   const [settingsClicked, setSettingsClicked] = useState(false);
 
   const route = useRoute();
   const routeName = getFocusedRouteNameFromRoute(route);
-  console.log(routeName);
+  // console.log(routeName);
 
   useEffect(() => {
     const showTab = Keyboard.addListener('keyboardDidShow', () => {
@@ -59,10 +60,6 @@ const Main = ({navigation}) => {
     func;
   };
 
-  const setTheme = () => {
-    setLightMode(lightMode ? false : true);
-  };
-
   const renderDrawer = () => {
     return (
       <View
@@ -74,11 +71,17 @@ const Main = ({navigation}) => {
         }}>
         <View style={{gap: 25}}>
           <Text
-            style={[styles.drawerText, {color: lightMode ? '#555' : '#fff'}]}>
+            style={[
+              styles.drawerText,
+              {color: theme == 'light' ? '#555' : '#fff'},
+            ]}>
             SHOPPING GUIDE
           </Text>
           <Text
-            style={[styles.drawerText, {color: lightMode ? '#555' : '#fff'}]}>
+            style={[
+              styles.drawerText,
+              {color: theme == 'light' ? '#555' : '#fff'},
+            ]}>
             MY ORDERS
           </Text>
 
@@ -86,12 +89,15 @@ const Main = ({navigation}) => {
             style={{flexDirection: 'row', alignItems: 'center', gap: 10}}
             onPress={() => setSettingsClicked(settingsClicked ? false : true)}>
             <Text
-              style={[styles.drawerText, {color: lightMode ? '#555' : '#fff'}]}>
+              style={[
+                styles.drawerText,
+                {color: theme == 'light' ? '#555' : '#fff'},
+              ]}>
               SETTINGS
             </Text>
             <Icon
               name={settingsClicked ? 'chevron-up' : 'chevron-down'}
-              color={lightMode ? '#555' : '#fff'}
+              color={theme == 'light' ? '#555' : '#fff'}
             />
           </Pressable>
           <View
@@ -101,25 +107,34 @@ const Main = ({navigation}) => {
               display: settingsClicked ? 'flex' : 'none',
             }}>
             <Text
-              style={[styles.drawerText, {color: lightMode ? '#555' : '#fff'}]}>
+              style={[
+                styles.drawerText,
+                {color: theme == 'light' ? '#555' : '#fff'},
+              ]}>
               ACCOUNT SETTINGS
             </Text>
             <Text
-              style={[styles.drawerText, {color: lightMode ? '#555' : '#fff'}]}>
+              style={[
+                styles.drawerText,
+                {color: theme == 'light' ? '#555' : '#fff'},
+              ]}>
               PAYMENT SETTINGS
             </Text>
           </View>
 
           <Text
-            style={[styles.drawerText, {color: lightMode ? '#555' : '#fff'}]}>
+            style={[
+              styles.drawerText,
+              {color: theme == 'light' ? '#555' : '#fff'},
+            ]}>
             HELP CENTER
           </Text>
         </View>
-        <Pressable style={{paddingBottom: 20}} onPress={() => setTheme()}>
+        <Pressable style={{paddingBottom: 20}} onPress={() => toggleTheme()}>
           <Icon
-            name={lightMode ? 'moon' : 'sun'}
+            name={theme == 'light' ? 'moon' : 'sun'}
             size={30}
-            color={lightMode ? '#555' : '#fff'}
+            color={theme == 'light' ? '#555' : '#fff'}
           />
         </Pressable>
       </View>
@@ -128,94 +143,103 @@ const Main = ({navigation}) => {
 
   return (
     <GestureHandlerRootView
-      style={[t.hFull, {backgroundColor: lightMode ? '#fff' : '#111'}]}>
+      style={{flex: 1, backgroundColor: theme == 'light' ? '#fff' : '#111'}}>
       <StatusBar
-        backgroundColor={lightMode ? '#fff' : '#111'}
-        // backgroundColor={'transparent'}
-        barStyle={lightMode ? 'dark-content' : 'light-content'}
+        backgroundColor={theme == 'light' ? '#fff' : '#111'}
+        barStyle={theme == 'light' ? 'dark-content' : 'light-content'}
         animated={true}
-        // translucent={true}
       />
       <DrawerLayout
         ref={drawer}
         drawerWidth={300}
         drawerPosition={'left'}
         renderNavigationView={renderDrawer}
-        drawerBackgroundColor={lightMode ? '#fff' : '#111'}
+        drawerBackgroundColor={theme == 'light' ? '#fff' : '#111'}
         onDrawerSlide={() => console.log('drawn')}
         keyboardDismissMode="on-drag"
         // gestureEnabled={gestureEnabled}
         // drawerLockMode="unlocked"
       >
-        <View style={[t.hFull, t.flex, t.flexCol, t.justifyBetween]}>
-          {/* <ProductContextProvider> */}
-          {/* <Home navigation={navigation} /> */}
+        {/* <View style={[t.hFull, t.flex, t.flexCol, t.justifyBetween]}> */}
 
-          <MainStack.Navigator initialRouteName="home">
-            <MainStack.Screen
-              name="home"
-              component={Home}
-              options={{headerShown: false}}
-            />
-            <MainStack.Screen
+        {/* <View style={{flex: 1, justifyContent: 'center'}}> */}
+
+        {/* <ProductContextProvider> */}
+        {/* <Home navigation={navigation} /> */}
+
+        <MainStack.Navigator initialRouteName="home">
+          <MainStack.Screen
+            name="home"
+            component={Home}
+            options={{headerShown: false}}
+          />
+          <MainStack.Screen
+            name="searchScreen"
+            component={SearchScreen}
+            options={{headerShown: false}}
+          />
+          {/* <MainStack.Screen
               name="catalog"
               component={Catalog}
               options={{headerShown: false}}
-            />
-            <MainStack.Screen
-              name="favorites"
-              component={Favourites}
-              options={{headerShown: false}}
-            />
-            <MainStack.Screen
-              name="newCollections"
-              component={NewCollectionsScreen}
-              options={{headerShown: false}}
-            />
-          </MainStack.Navigator>
+            /> */}
+          <MainStack.Screen
+            name="favorites"
+            component={Favourites}
+            options={{headerShown: false}}
+          />
+          <MainStack.Screen
+            name="newCollections"
+            component={NewCollectionsScreen}
+            options={{headerShown: false}}
+          />
+        </MainStack.Navigator>
 
-          {/* </ProductContextProvider> */}
+        {/* </ProductContextProvider> */}
 
-          {/* #ff6f61 */}
-          <View
-            style={[
-              t.flexRow,
-              t.itemsCenter,
-              t.hAuto,
-              t.pY5,
-              // t.justifyAround,
-              t.m5,
-              // t.mB2,
-              // t.mT2,
-              t.roundedFull,
-              {
-                // backgroundColor: '#07172a',
-                display: keyboardStatus ? 'none' : 'flex',
-                marginTop: 7,
-                marginBottom: 6,
-                justifyContent: 'space-between',
-                gap: 15,
-              },
-            ]}>
-            <Pressable
-              onPress={() => handleTapPress(1, navigation.navigate('home'))}>
-              <View>
-                <Icon
-                  name="house"
-                  size={27}
-                  color={
-                    routeName == 'home' || 'newCollections'
-                      ? lightMode
-                        ? '#222'
-                        : '#fff'
-                      : lightMode
-                      ? 'rgba(0, 0, 0, 0.25)'
-                      : 'rgba(255, 255, 255, 0.2)'
-                  }
-                />
-              </View>
-            </Pressable>
-            <Pressable
+        {/* #ff6f61 */}
+        <View
+          style={[
+            t.flexRow,
+            t.itemsCenter,
+            t.hAuto,
+            t.pY5,
+
+            t.m5,
+
+            t.roundedFull,
+            {
+              // backgroundColor: '#07172a',
+              display: keyboardStatus ? 'none' : 'flex',
+              marginTop: 7,
+              marginBottom: 6,
+              justifyContent: 'space-between',
+              paddingHorizontal: 25,
+              // alignSelf: 'baseline',
+              // gap: 25,
+            },
+          ]}>
+          <Pressable
+            onPress={() => handleTapPress(1, navigation.navigate('home'))}>
+            <View>
+              <Icon
+                name="house"
+                size={27}
+                color={
+                  routeName == 'home' ||
+                  routeName == 'newCollections' ||
+                  routeName == 'searchScreen'
+                    ? theme == 'light'
+                      ? '#222'
+                      : '#fff'
+                    : theme == 'light'
+                    ? 'rgba(0, 0, 0, 0.25)'
+                    : 'rgba(255, 255, 255, 0.2)'
+                }
+              />
+            </View>
+          </Pressable>
+          {/* <Pressable
               onPress={() => handleTapPress(2, navigation.navigate('catalog'))}>
               <View>
                 <Icon5
@@ -223,109 +247,107 @@ const Main = ({navigation}) => {
                   size={27}
                   color={
                     routeName == 'catalog'
-                      ? lightMode
+                      ? theme == 'light'
                         ? '#222'
                         : '#fff'
-                      : lightMode
+                      : theme == 'light'
                       ? 'rgba(0, 0, 0, 0.25)'
                       : 'rgba(255, 255, 255, 0.2)'
                   }
                 />
               </View>
-            </Pressable>
-            <Pressable
-              onPress={() =>
-                handleTapPress(1, navigation.navigate('favorites'))
-              }
-              style={{alignItems: 'center', justifyContent: 'center'}}>
-              {favouriteItems?.length > 0 && (
-                <View
-                  style={[
-                    t.roundedFull,
-                    t.flex,
-                    t.justifyCenter,
-                    t.itemsCenter,
-                    // t.p3,
-                    {
-                      backgroundColor: '#36346C',
-                      position: 'absolute',
-                      height: 8,
-                      width: 8,
-                      top: -8.5,
-                      right: -5,
-                    },
-                  ]}></View>
-              )}
+            </Pressable> */}
+          <Pressable
+            onPress={() => handleTapPress(1, navigation.navigate('favorites'))}
+            style={{alignItems: 'center', justifyContent: 'center'}}>
+            {favouriteItems?.length > 0 && (
+              <View
+                style={[
+                  t.flex,
+                  t.justifyCenter,
+                  t.itemsCenter,
+                  // t.p3,
+                  {
+                    backgroundColor: '#36346C',
+                    position: 'absolute',
+                    height: 7,
+                    width: 7,
+                    borderRadius: 3.5,
+                    top: -8.5,
+                    right: -5,
+                  },
+                ]}></View>
+            )}
 
-              <View>
-                <Icon
-                  name="heart"
-                  size={27}
-                  solid={true}
-                  color={
-                    routeName == 'favorites'
-                      ? lightMode
-                        ? '#222'
-                        : '#fff'
-                      : lightMode
-                      ? 'rgba(0, 0, 0, 0.25)'
-                      : 'rgba(255, 255, 255, 0.2)'
-                  }
-                />
-              </View>
-            </Pressable>
-
-            <Pressable
-              onPress={() => handleTapPress(3, navigation.navigate('cart'))}
-              style={{alignItems: 'center', justifyContent: 'center'}}>
-              {cartItems?.length > 0 && (
-                <View
-                  style={[
-                    t.roundedFull,
-                    t.flex,
-                    t.justifyCenter,
-                    t.itemsCenter,
-                    // t.p3,
-                    {
-                      backgroundColor: '#36346C',
-                      position: 'absolute',
-                      height: 8,
-                      width: 8,
-                      top: -8.5,
-                      right: -5,
-                    },
-                  ]}></View>
-              )}
+            <View>
               <Icon
-                name="bag-shopping"
+                name="heart"
+                size={27}
+                solid={true}
+                color={
+                  routeName == 'favorites'
+                    ? theme == 'light'
+                      ? '#222'
+                      : '#fff'
+                    : theme == 'light'
+                    ? 'rgba(0, 0, 0, 0.25)'
+                    : 'rgba(255, 255, 255, 0.2)'
+                }
+              />
+            </View>
+          </Pressable>
+
+          <Pressable
+            onPress={() => handleTapPress(3, navigation.navigate('cart'))}
+            style={{alignItems: 'center', justifyContent: 'center'}}>
+            {cartItems?.length > 0 && (
+              <View
+                style={[
+                  t.flex,
+                  t.justifyCenter,
+                  t.itemsCenter,
+                  // t.p3,
+                  {
+                    backgroundColor: '#36346C',
+                    position: 'absolute',
+                    height: 7,
+                    width: 7,
+                    borderRadius: 3.5,
+                    top: -8.5,
+                    right: -5,
+                  },
+                ]}></View>
+            )}
+            <Icon
+              name="bag-shopping"
+              size={27}
+              color={
+                route.name == 'cart'
+                  ? '#36346C'
+                  : theme == 'light'
+                  ? 'rgba(0, 0, 0, 0.25)'
+                  : 'rgba(255, 255, 255, 0.2)'
+              }
+              solid={true}
+            />
+          </Pressable>
+
+          <Pressable onPress={() => handleTapPress(4)}>
+            <View>
+              <Icon
+                name="bell"
                 size={27}
                 color={
-                  route.name == 'cart'
-                    ? '#36346C'
-                    : lightMode
+                  theme == 'light'
                     ? 'rgba(0, 0, 0, 0.25)'
                     : 'rgba(255, 255, 255, 0.2)'
                 }
                 solid={true}
               />
-            </Pressable>
-
-            <Pressable onPress={() => handleTapPress(4)}>
-              <View>
-                <Icon
-                  name="bell"
-                  size={27}
-                  color={
-                    lightMode
-                      ? 'rgba(0, 0, 0, 0.25)'
-                      : 'rgba(255, 255, 255, 0.2)'
-                  }
-                  solid={true}
-                />
-              </View>
-            </Pressable>
-          </View>
+            </View>
+          </Pressable>
         </View>
+        {/* </View> */}
       </DrawerLayout>
     </GestureHandlerRootView>
   );

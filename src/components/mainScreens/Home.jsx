@@ -16,8 +16,8 @@ import ProductContext from '../../context/ProductContext';
 
 const Home = ({navigation}) => {
   const {
-    lightMode,
-    products,
+    theme,
+    allProducts,
     drawer,
     favouriteItems,
     newCollections,
@@ -59,9 +59,13 @@ const Home = ({navigation}) => {
     outputRange: [1, 2, 3],
   });
   return (
-    <View style={{flex: 1, backgroundColor: lightMode ? '#fff' : '#111'}}>
+    <View
+      style={{flex: 1, backgroundColor: theme == 'light' ? '#fff' : '#111'}}>
       <View
-        style={{elevation: 3, backgroundColor: lightMode ? '#fff' : '#111'}}>
+        style={{
+          elevation: 3,
+          backgroundColor: theme == 'light' ? '#fff' : '#111',
+        }}>
         <View
           style={{
             flexDirection: 'row',
@@ -74,27 +78,28 @@ const Home = ({navigation}) => {
             <Icon
               name="bars-staggered"
               size={30}
-              color={lightMode ? '#222' : '#fff'}
+              color={theme == 'light' ? '#222' : '#fff'}
             />
           </Pressable>
 
-          <Text style={{color: lightMode ? '#222' : '#fff', fontSize: 25}}>
+          <Text
+            style={{color: theme == 'light' ? '#222' : '#fff', fontSize: 25}}>
             Levon
           </Text>
 
-          <Pressable>
+          <TouchableOpacity onPress={() => navigation.navigate('searchScreen')}>
             <Icon
               name="magnifying-glass"
               size={30}
-              color={lightMode ? '#222' : '#fff'}
+              color={theme == 'light' ? '#222' : '#fff'}
             />
-          </Pressable>
+          </TouchableOpacity>
         </View>
       </View>
       <ScrollView contentContainerStyle={{gap: 10}}>
         <View style={styles.imageContainer}>
           <Animated.Image
-            source={newCollections[imgIndex].source}
+            source={newCollections[imgIndex].imageSource}
             style={[
               styles.image,
               {transform: [{scaleX: interpolateWH}, {scaleY: interpolateWH}]},
@@ -116,7 +121,7 @@ const Home = ({navigation}) => {
         {/*  */}
         <View style={styles.imageContainer}>
           <Animated.Image
-            source={newCollections[imgIndex + 3].source}
+            source={newCollections[imgIndex + 3].imageSource}
             style={[
               styles.image,
               {transform: [{scaleX: interpolateWH}, {scaleY: interpolateWH}]},
@@ -125,7 +130,7 @@ const Home = ({navigation}) => {
           />
           <View style={styles.abseoluteChild}>
             <Text style={{color: '#fff', fontSize: 35, fontWeight: 300}}>
-              Recommended
+              Trending
             </Text>
             <TouchableOpacity style={styles.imageBtn}>
               <Text style={styles.imageBtnTxt}>Shop Now</Text>
@@ -136,7 +141,7 @@ const Home = ({navigation}) => {
         {/*  */}
         <View style={styles.imageContainer}>
           <Animated.Image
-            source={newCollections[imgIndex + 6].source}
+            source={newCollections[imgIndex + 2].imageSource}
             style={[
               styles.image,
               {transform: [{scaleX: interpolateWH}, {scaleY: interpolateWH}]},
@@ -156,7 +161,7 @@ const Home = ({navigation}) => {
         {/*  */}
         <View style={styles.imageContainer}>
           <Animated.Image
-            source={products[imgIndex].source}
+            source={allProducts[imgIndex].imageSource}
             style={[
               styles.image,
               {transform: [{scaleX: interpolateWH}, {scaleY: interpolateWH}]},

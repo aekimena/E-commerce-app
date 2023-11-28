@@ -20,52 +20,47 @@ import {
   Gesture,
   GestureDetector,
 } from 'react-native-gesture-handler';
+import {runOnJS} from 'react-native-reanimated';
 
 const Cart = ({navigation}) => {
   const {
-    products,
+    allProducts,
     cartItems,
     setCartItems,
+    cartArray,
+    setCartArray,
     handleNewValue,
     productId,
     setProductId,
     handleNewQuantityValue,
     handleNewPriceValue,
-    lightMode,
+    theme,
   } = useContext(ProductContext);
 
   const [totalPrice, setTotalPrice] = useState([]);
   const [totalItem, setTotalItem] = useState(0);
   const [cartBgCol, setCartBgCol] = useState('transparent');
 
-  const handleDisplayProduct = product => {
-    setProductId(product.id);
+  const handleDisplayProduct = item => {
+    setProductId(item.id);
     navigation.navigate('ProductDisplay');
-    console.log(productId);
   };
 
-  const singleTap = product =>
-    Gesture.Tap()
-      .maxDuration(250)
-      .onStart(() => {
-        setCartBgCol('rgba(7, 23, 42, 0.02)'), handleDisplayProduct(product);
-      })
-      .onEnd(() => setCartBgCol('transparent'));
   useEffect(() => {
     setTotalPrice(
-      cartItems
+      cartArray
         .map(item => item.price)
         .reduce((x, y) => x + y, 0)
         .toFixed(2),
     );
     setTotalItem(
-      cartItems.map(item => item.quantity).reduce((x, y) => x + y, 0),
+      cartArray.map(item => item.quantity).reduce((x, y) => x + y, 0),
     );
-  }, [cartItems]);
+  }, [cartArray]);
 
   const handleDeleteAll = () => {
-    products.map(product => handleNewValue(product.id, false, product));
     setCartItems([]);
+    setCartArray([]);
   };
 
   const handleAddBtn = item => {
@@ -81,9 +76,12 @@ const Cart = ({navigation}) => {
       : null;
   };
 
-  const deleteItem = (id, item) => {
-    handleNewValue(id, false, item);
-    console.log(id);
+  const deleteItem = item => {
+    // handleNewValue(false, item.id);
+    // setCartArray(cartArray.filter(cart => cart.id !== item.id));
+    cartItems.includes(item.id) &&
+      setCartItems(cartItems.filter(cart => cart !== item.id));
+    setCartArray(cartArray.filter(obj => obj.id !== item.id));
   };
 
   const renderLeftActions = () => {
@@ -91,9 +89,10 @@ const Cart = ({navigation}) => {
       <View
         style={{
           flex: 1,
-          backgroundColor: lightMode
-            ? 'rgba(7, 23, 42, 0.02)'
-            : 'rgba(68, 68, 68, 0.2)',
+          backgroundColor:
+            theme == 'light'
+              ? 'rgba(7, 23, 42, 0.02)'
+              : 'rgba(68, 68, 68, 0.2)',
 
           justifyContent: 'center',
         }}>
@@ -107,37 +106,62 @@ const Cart = ({navigation}) => {
     );
   };
 
+  const singleTap = item =>
+    Gesture.Tap()
+      .numberOfTaps(1)
+      .maxDuration(0.3)
+      .onEnd(() => {
+        runOnJS(handleDisplayProduct)(item);
+      });
+  // .onEnd(() => {
+  //   runOnJS(setCartBgCol)('transparent');
+  // });
+
+  // const renderedCartItem = cartItem => {
+  //   return allProducts[allProducts.findIndex(obj => obj.id == cartItem)];
+  // };
+
   return (
     <GestureHandlerRootView
       style={[
         styles.container,
-        {backgroundColor: lightMode ? '#fff' : '#111'},
+        {backgroundColor: theme == 'light' ? '#fff' : '#111'},
       ]}>
       <StatusBar
-        backgroundColor={lightMode ? '#fff' : '#111'}
-        barStyle={lightMode ? 'dark-content' : 'light-content'}
+        backgroundColor={theme == 'light' ? '#fff' : '#111'}
+        barStyle={theme == 'light' ? 'dark-content' : 'light-content'}
         animated={true}
+        translucent={false}
       />
       <View style={styles.header}>
         <Pressable
-          style={[styles.topBtn, {borderColor: lightMode ? '#222' : '#fff'}]}
+          style={[
+            styles.topBtn,
+            {borderColor: theme == 'light' ? '#222' : '#fff'},
+          ]}
           onPress={() => navigation.navigate('main')}>
           <Icon
             name="chevron-left"
             size={20}
-            color={lightMode ? '#222' : '#fff'}
+            color={theme == 'light' ? '#222' : '#fff'}
           />
         </Pressable>
         <View>
-          <Text style={{fontSize: 25, color: '#111'}}>Cart({totalItem})</Text>
+          <Text
+            style={{fontSize: 25, color: theme == 'light' ? '#222' : '#fff'}}>
+            Cart({totalItem})
+          </Text>
         </View>
         <Pressable
-          style={[styles.topBtn, {borderColor: lightMode ? '#222' : '#fff'}]}
+          style={[
+            styles.topBtn,
+            {borderColor: theme == 'light' ? '#222' : '#fff'},
+          ]}
           onPress={() => handleDeleteAll()}>
           <Icon5
             name="trash-alt"
             size={20}
-            color={lightMode ? '#222' : '#fff'}
+            color={theme == 'light' ? '#222' : '#fff'}
           />
         </Pressable>
       </View>
@@ -145,16 +169,18 @@ const Cart = ({navigation}) => {
       <View
         style={{
           flex: 1,
-          backgroundColor: lightMode ? '#fff' : '#111',
+          backgroundColor: theme == 'light' ? '#fff' : '#111',
           marginTop: 15,
         }}>
         <ScrollView showsVerticalScrollIndicator={false}>
-          {cartItems?.length > 0 &&
-            cartItems.map(cartItem => (
+          {cartArray?.length > 0 &&
+            // allProducts
+            //   .filter(item => cartItems.includes(item.id))
+            cartArray.map(cartItem => (
               <Swipeable
                 renderLeftActions={renderLeftActions}
                 friction={1}
-                onSwipeableOpen={() => deleteItem(cartItem.id, cartItem)}
+                onSwipeableOpen={() => deleteItem(cartItem)}
                 key={cartItem.id}>
                 <View
                   style={{
@@ -178,7 +204,7 @@ const Cart = ({navigation}) => {
                         flex: 1,
                       }}>
                       <Image
-                        source={cartItem.source}
+                        source={cartItem.imageSource}
                         resizeMode="contain"
                         style={{height: 110, width: 110, borderRadius: 10}}
                       />
@@ -189,27 +215,43 @@ const Cart = ({navigation}) => {
 
                           flex: 1,
                         }}>
-                        <Text
+                        {/* <Text
                           style={{
                             fontSize: 20,
                             fontWeight: 500,
-                            color: lightMode ? '#222' : '#fff',
+                            color: theme == 'light' ? '#222' : '#fff',
+                          }} */}
+                        <Text
+                          style={{
+                            color: theme == 'light' ? '#222' : '#fff',
+                            fontWeight: 'bold',
+                            fontSize: 20,
                           }}
                           numberOfLines={1}>
                           {cartItem.title}
                         </Text>
-                        {/* <Text style={{fontSize: 17}}>{cartItem.category}</Text> */}
+
                         <Text
                           style={{
-                            fontSize: 25,
-                            fontWeight: 600,
-                            color: lightMode ? '#222' : '#fff',
+                            color: theme == 'light' ? '#555' : '#999',
+                            fontWeight: 'bold',
+                            fontSize: 20,
                           }}>
-                          ${cartItem.price.toFixed(2)}
+                          <Icon name="naira-sign" size={15} />
+                          {cartItem.price.toFixed(2)}
+                        </Text>
+                        <Text
+                          style={{
+                            color: theme == 'light' ? '#555' : '#999',
+                            fontSize: 16,
+                            fontWeight: 500,
+                          }}>
+                          Available stock: {cartItem.stock}
                         </Text>
                       </View>
                     </View>
                   </GestureDetector>
+
                   <View
                     style={{
                       justifyContent: 'center',
@@ -221,16 +263,17 @@ const Cart = ({navigation}) => {
                       style={[
                         styles.addMinusBtn,
                         {
-                          backgroundColor: lightMode
-                            ? 'rgba(7, 23, 42, 0.05)'
-                            : 'rgba(68, 68, 68, 0.3)',
+                          backgroundColor:
+                            theme == 'light'
+                              ? 'rgba(7, 23, 42, 0.05)'
+                              : 'rgba(68, 68, 68, 0.3)',
                         },
                       ]}
                       onPress={() => handleAddBtn(cartItem)}>
                       <Icon
                         name="plus"
                         size={15}
-                        color={lightMode ? '#222' : '#fff'}
+                        color={theme == 'light' ? '#222' : '#fff'}
                       />
                     </Pressable>
 
@@ -238,7 +281,7 @@ const Cart = ({navigation}) => {
                       style={{
                         fontSize: 16,
                         fontWeight: 'bold',
-                        color: lightMode ? '#222' : '#fff',
+                        color: theme == 'light' ? '#222' : '#fff',
                       }}>
                       {cartItem.quantity}
                     </Text>
@@ -246,16 +289,17 @@ const Cart = ({navigation}) => {
                       style={[
                         styles.addMinusBtn,
                         {
-                          backgroundColor: lightMode
-                            ? 'rgba(7, 23, 42, 0.05)'
-                            : 'rgba(68, 68, 68, 0.3)',
+                          backgroundColor:
+                            theme == 'light'
+                              ? 'rgba(7, 23, 42, 0.05)'
+                              : 'rgba(68, 68, 68, 0.3)',
                         },
                       ]}
                       onPress={() => handleMinusBtn(cartItem)}>
                       <Icon
                         name="minus"
                         size={15}
-                        color={lightMode ? '#222' : '#fff'}
+                        color={theme == 'light' ? '#222' : '#fff'}
                       />
                     </Pressable>
                   </View>
@@ -268,7 +312,7 @@ const Cart = ({navigation}) => {
         <View>
           <Text
             style={{
-              color: lightMode ? '#222' : '#fff',
+              color: theme == 'light' ? '#222' : '#fff',
               fontSize: 17,
               fontWeight: 500,
             }}>
@@ -277,10 +321,11 @@ const Cart = ({navigation}) => {
           <Text
             style={{
               fontSize: 30,
-              color: lightMode ? '#222' : '#fff',
+              color: theme == 'light' ? '#222' : '#fff',
               fontWeight: 'bold',
             }}>
-            ${totalPrice}
+            <Icon name="naira-sign" size={22} />
+            {totalPrice}
           </Text>
         </View>
         <View
