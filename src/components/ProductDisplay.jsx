@@ -10,12 +10,11 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState, useContext, useCallback, useMemo, useRef} from 'react';
-import {t, theme} from 'react-native-tailwindcss';
+import React, {useState, useContext} from 'react';
+import {t} from 'react-native-tailwindcss';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import ProductContext from '../context/ProductContext';
 import StarRating from 'react-native-star-rating';
-// import {ScrollView} from 'react-native-gesture-handler';
 import CartDisplay from './CartDisplay';
 
 const ProductDisplay = ({navigation}) => {
@@ -26,7 +25,7 @@ const ProductDisplay = ({navigation}) => {
     handleNewFavouriteValue,
     theme,
     newRating,
-    cartItems,
+    cartIds,
     handleAddBtn,
     handleMinusBtn,
     cartArray,
@@ -41,7 +40,7 @@ const ProductDisplay = ({navigation}) => {
   };
 
   const [activeSizeBtn, setActiveSizeBtn] = useState(1);
-  // const [starCount, setStarCount] = useState(0);
+
   const handleSizeBtnPress = id => {
     setActiveSizeBtn(id);
   };
@@ -189,30 +188,7 @@ const ProductDisplay = ({navigation}) => {
               alignSelf: 'center',
             }}
           />
-          {/* <View
-            style={{
-              position: 'absolute',
-              zIndex: 20,
-              padding: 5,
-              bottom: 0,
-              flexDirection: 'row',
-              alignItems: 'flex-end',
-              gap: 10,
-              alignSelf: 'center',
-            }}>
-            <StarRating
-              disabled={false}
-              maxStars={5}
-              rating={productIndex.rating}
-              selectedStar={rating => ratingChange(productIndex.id, rating)}
-              fullStarColor={'#ffe169'}
-              emptyStarColor={'#fff'}
-              buttonStyle={{margin: 5, marginBottom: 0}}
-            />
-            <Text style={{color: '#fff', fontSize: 20, fontWeight: 'bold'}}>
-              3.2/5
-            </Text>
-          </View> */}
+
           <View
             style={{
               position: 'absolute',
@@ -303,16 +279,13 @@ const ProductDisplay = ({navigation}) => {
         </View>
       </ScrollView>
       <View
-        style={{
-          backgroundColor: theme == 'light' ? '#fff' : '#111',
-          height: 90,
-          width: '100%',
-          justifyContent: 'center',
-          borderTopWidth: 0.5,
-          borderTopColor: '#111',
-          paddingHorizontal: 20,
-        }}>
-        {!cartItems.includes(productIndex.id) && (
+        style={[
+          styles.addToCartContainer,
+          {
+            backgroundColor: theme == 'light' ? '#fff' : '#111',
+          },
+        ]}>
+        {!cartIds.includes(productIndex.id) && (
           <TouchableOpacity onPress={() => cartUpdate(true, productIndex)}>
             <View
               style={{
@@ -328,7 +301,7 @@ const ProductDisplay = ({navigation}) => {
             </View>
           </TouchableOpacity>
         )}
-        {cartItems.includes(productIndex.id) && (
+        {cartIds.includes(productIndex.id) && (
           <View
             style={{
               flexDirection: 'row',
@@ -482,5 +455,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
+  },
+  addToCartContainer: {
+    height: 90,
+    width: '100%',
+    justifyContent: 'center',
+    borderTopWidth: 0.5,
+    borderTopColor: '#111',
+    paddingHorizontal: 20,
   },
 });

@@ -4,18 +4,16 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  Animated,
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useContext, useEffect, useState, useRef} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import Icon5 from 'react-native-vector-icons/FontAwesome5';
-import {t} from 'react-native-tailwindcss';
+
 import ProductContext from '../context/ProductContext';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import {RectButton} from 'react-native-gesture-handler';
 
 import {
   GestureHandlerRootView,
@@ -26,8 +24,8 @@ import {runOnJS} from 'react-native-reanimated';
 
 const Cart = ({navigation}) => {
   const {
-    cartItems,
-    setCartItems,
+    cartIds,
+    setCartIds,
     cartArray,
     setCartArray,
 
@@ -42,7 +40,6 @@ const Cart = ({navigation}) => {
 
   const [totalPrice, setTotalPrice] = useState([]);
   const [totalItem, setTotalItem] = useState(0);
-  const [cartBgCol, setCartBgCol] = useState('transparent');
 
   const handleDisplayProduct = item => {
     refRBSheet.current.close();
@@ -58,13 +55,13 @@ const Cart = ({navigation}) => {
   }, [cartArray]);
 
   const handleDeleteAll = () => {
-    setCartItems([]);
+    setCartIds([]);
     setCartArray([]);
   };
 
   const deleteItem = item => {
-    cartItems.includes(item.id) &&
-      setCartItems(cartItems.filter(cart => cart !== item.id));
+    cartIds.includes(item.id) &&
+      setCartIds(cartIds.filter(cart => cart !== item.id));
     setCartArray(cartArray.filter(obj => obj.id !== item.id));
   };
 
@@ -98,8 +95,11 @@ const Cart = ({navigation}) => {
   return (
     <GestureHandlerRootView
       style={[
-        styles.container,
-        {backgroundColor: theme == 'light' ? '#fff' : '#111'},
+        {
+          flex: 1,
+          gap: 10,
+          backgroundColor: theme == 'light' ? '#fff' : '#111',
+        },
       ]}>
       <View style={styles.header}>
         <Pressable onPress={() => refRBSheet.current.close()}>
@@ -139,28 +139,15 @@ const Cart = ({navigation}) => {
                 onSwipeableOpen={() => deleteItem(cartItem)}
                 key={cartItem.id}>
                 <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    backgroundColor: theme == 'light' ? '#fff' : '#111',
-                    borderColor: '#222',
-                    borderTopWidth: 0.5,
-
-                    gap: 15,
-                    paddingVertical: 10,
-                    paddingHorizontal: 20,
-                  }}>
+                  style={[
+                    styles.cartContainer,
+                    {
+                      backgroundColor: theme == 'light' ? '#fff' : '#111',
+                    },
+                  ]}>
                   <GestureDetector
                     gesture={Gesture.Exclusive(singleTap(cartItem))}>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        gap: 15,
-                        flex: 1,
-                      }}>
+                    <View style={styles.gestureDetectorChild}>
                       <Image
                         source={cartItem.imageSource}
                         resizeMode="contain"
@@ -170,7 +157,6 @@ const Cart = ({navigation}) => {
                       <View
                         style={{
                           gap: 10,
-
                           flex: 1,
                         }}>
                         <Text
@@ -260,16 +246,18 @@ const Cart = ({navigation}) => {
         </ScrollView>
       </View>
       <View
-        style={{
-          backgroundColor: theme == 'light' ? '#fff' : '#111',
-          height: 90,
-          width: '100%',
-          justifyContent: 'center',
-          borderTopWidth: 0.5,
-          borderTopColor: '#111',
-          paddingHorizontal: 20,
-        }}>
-        <View style={styles.footer}>
+        style={[
+          styles.footerContainer,
+          {
+            backgroundColor: theme == 'light' ? '#fff' : '#111',
+          },
+        ]}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 20,
+          }}>
           <View>
             <Text
               style={{
@@ -314,11 +302,6 @@ const Cart = ({navigation}) => {
 export default Cart;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-
-    gap: 10,
-  },
   header: {
     marginTop: 15,
     flexDirection: 'row',
@@ -338,13 +321,6 @@ const styles = StyleSheet.create({
     borderColor: '#07172a',
   },
 
-  footer: {
-    flexDirection: 'row',
-
-    alignItems: 'center',
-
-    gap: 20,
-  },
   addMinusBtn: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -358,5 +334,30 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 10,
+  },
+  cartContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderColor: '#222',
+    borderTopWidth: 0.5,
+    gap: 15,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  gestureDetectorChild: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 15,
+    flex: 1,
+  },
+  footerContainer: {
+    height: 90,
+    width: '100%',
+    justifyContent: 'center',
+    borderTopWidth: 0.5,
+    borderTopColor: '#111',
+    paddingHorizontal: 20,
   },
 });

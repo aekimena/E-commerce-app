@@ -31,10 +31,17 @@ const ProductContextProvider = ({children}) => {
   const [newCollections, setNewCollections] = useState(
     allProducts.filter(item => newCollectionsIds.includes(item.id)),
   );
-  const [cartItems, setCartItems] = useState([]);
+  const [cartIds, setCartIds] = useState([]);
   const [cartArray, setCartArray] = useState([]);
   const [favouriteItems, setFavouritesItems] = useState([]);
   const [productId, setProductId] = useState(null);
+  const [filteredProducts, setFilteredProducts] = useState(allProducts);
+  const [filteredNewCollections, setFilteredNewCollections] =
+    useState(newCollections);
+  const drawer = useRef(null);
+  const refRBSheet = useRef();
+
+  const [theme, setTheme] = useState('light');
 
   const renderedCartItem = cartItem => {
     return allProducts[allProducts.findIndex(obj => obj.id == cartItem)];
@@ -52,25 +59,23 @@ const ProductContextProvider = ({children}) => {
     };
   };
 
-  const [filteredProducts, setFilteredProducts] = useState(allProducts);
-  const [filteredNewCollections, setFilteredNewCollections] =
-    useState(newCollections);
-  const drawer = useRef(null);
-  const refRBSheet = useRef();
-
-  const [theme, setTheme] = useState('light');
+  // function for adding product to cart and AsyncStorage
 
   const addToCartAndStorage = (product, newObj) => {
-    setCartItems([...cartItems, product.id]);
+    setCartIds([...cartIds, product.id]);
     setCartArray([...cartArray, newObj]);
   };
 
+  // function for deleting cart item from cart and AsyncStorage
+
   const deleteFromCartAndStorage = product => {
-    setCartItems(cartItems.filter(item => item !== product.id));
+    setCartIds(cartIds.filter(item => item !== product.id));
     setCartArray(cartArray.filter(item => item.id !== product.id));
   };
 
-  const cartUpdate = (newValue, product) => {
+  // function for updating cart
+
+  const cartUpdate = (boolean, product) => {
     const newObject = {
       id: product.id,
       title: renderedCartItem(product.id).title,
@@ -80,14 +85,16 @@ const ProductContextProvider = ({children}) => {
       stock: renderedCartItem(product.id).stock,
       quantity: 1,
     };
-    newValue
+    boolean
       ? addToCartAndStorage(product, newObject)
       : deleteFromCartAndStorage(product);
   };
 
-  const handleNewFavouriteValue = (id, newValue, addedIem) => {
+  // function for favorite items update
+
+  const handleNewFavouriteValue = (id, boolean, originalItem) => {
     const newFavouriteItem = {
-      id: addedIem.id,
+      id: originalItem.id,
       title: allProducts[allProducts.findIndex(obj => obj.id == id)].title,
       price: allProducts[allProducts.findIndex(obj => obj.id == id)].price,
       favorite: allProducts[allProducts.findIndex(obj => obj.id == id)].liked,
@@ -97,17 +104,17 @@ const ProductContextProvider = ({children}) => {
         allProducts[allProducts.findIndex(obj => obj.id == id)].addedToCart,
     };
     setAllProducts(prevData =>
-      prevData.map(item =>
-        item.id === id ? {...item, liked: newValue} : item,
-      ),
+      prevData.map(item => (item.id === id ? {...item, liked: boolean} : item)),
     );
-
-    newValue
+    boolean
       ? setFavouritesItems([...favouriteItems, newFavouriteItem])
       : setFavouritesItems(
-          favouriteItems.filter(item => item.id !== addedIem.id),
+          favouriteItems.filter(item => item.id !== originalItem.id),
         );
   };
+
+  // function to add quantity of cart item
+
   const handleAddQuantityValue = id => {
     setCartArray(prevData =>
       prevData.map(item =>
@@ -116,6 +123,8 @@ const ProductContextProvider = ({children}) => {
     );
   };
 
+  // function to minus quantity of cart item
+
   const handleMinusQuantityValue = id => {
     setCartArray(prevData =>
       prevData.map(item =>
@@ -123,6 +132,9 @@ const ProductContextProvider = ({children}) => {
       ),
     );
   };
+
+  // function to add price of cart item
+
   const handleAddPriceValue = id => {
     setCartArray(prevData =>
       prevData.map(item =>
@@ -132,6 +144,8 @@ const ProductContextProvider = ({children}) => {
       ),
     );
   };
+
+  // function to minus price of cart item
 
   const handleMinusPriceValue = id => {
     setCartArray(prevData =>
@@ -143,6 +157,8 @@ const ProductContextProvider = ({children}) => {
     );
   };
 
+  // function for add button press of cart item
+
   const handleAddBtn = item => {
     item.quantity < item.stock
       ? (handleAddQuantityValue(item.id), handleAddPriceValue(item.id))
@@ -150,6 +166,9 @@ const ProductContextProvider = ({children}) => {
           prevData.map(item => item.id == item.id && item),
         );
   };
+
+  // function for minus button press of cart item
+
   const handleMinusBtn = item => {
     item.quantity > 1
       ? (handleMinusQuantityValue(item.id), handleMinusPriceValue(item.id))
@@ -158,6 +177,8 @@ const ProductContextProvider = ({children}) => {
         );
   };
 
+  // update product rating
+
   const newRating = (id, rating) => {
     setAllProducts(prevData =>
       prevData.map(item => (item.id === id ? {...item, rating: rating} : item)),
@@ -165,6 +186,8 @@ const ProductContextProvider = ({children}) => {
   };
 
   useEffect(() => {
+    // load theme from AsyncStorage
+
     async function loadTheme() {
       try {
         const savedTheme = await AsyncStorage.getItem('theme');
@@ -178,11 +201,13 @@ const ProductContextProvider = ({children}) => {
 
     loadTheme();
 
+    // load cart from AsyncStorage
+
     async function loadCart() {
       try {
         const savedCart = await AsyncStorage.getItem('cart');
         if (savedCart) {
-          setCartItems(
+          setCartIds(
             JSON.parse(savedCart).filter(
               item => allProducts.findIndex(obj => obj.id == item) !== -1,
             ),
@@ -207,11 +232,13 @@ const ProductContextProvider = ({children}) => {
 
   // clearItem();
 
+  // update cart in AsyncStorage for every change in cart
+
   useEffect(() => {
-    AsyncStorage.setItem('cart', JSON.stringify(cartItems)).catch(error => {
+    AsyncStorage.setItem('cart', JSON.stringify(cartIds)).catch(error => {
       console.error('Error saving cart to AsyncStorage:', error);
     });
-  }, [cartItems]);
+  }, [cartIds]);
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -225,18 +252,15 @@ const ProductContextProvider = ({children}) => {
     <ProductContext.Provider
       value={{
         productId,
-
         allProducts,
         setProductId,
-
         cartUpdate,
-        cartItems,
-        setCartItems,
+        cartIds,
+        setCartIds,
         cartArray,
         setCartArray,
         drawer,
         refRBSheet,
-
         handleNewFavouriteValue,
         favouriteItems,
         filteredProducts,

@@ -24,7 +24,7 @@ const NewCollectionsScreen = ({navigation}) => {
     cartUpdate,
     handleNewFavouriteValue,
     filteredNewCollections,
-    cartItems,
+    cartIds,
   } = useContext(ProductContext);
   // const [activeBtn, setActiveBtn] = useState(1);
 
@@ -342,12 +342,12 @@ const NewCollectionsScreen = ({navigation}) => {
                     ]}
                     onPress={() =>
                       cartUpdate(
-                        cartItems.includes(product.id) ? false : true,
+                        cartIds.includes(product.id) ? false : true,
                         product,
                       )
                     }>
                     <Icon
-                      name={cartItems.includes(product.id) ? 'check' : 'plus'}
+                      name={cartIds.includes(product.id) ? 'check' : 'plus'}
                       size={20}
                       color={'#fff'}
                       solid={false}
