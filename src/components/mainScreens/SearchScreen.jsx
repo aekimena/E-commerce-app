@@ -34,41 +34,52 @@ const SearchScreen = ({navigation}) => {
     <View
       style={{flex: 1, backgroundColor: theme == 'light' ? '#fff' : '#111'}}>
       <StatusBar
-        backgroundColor={theme == 'light' ? '#fff' : '#111'}
+        backgroundColor={'transparent'}
         barStyle={theme == 'light' ? 'dark-content' : 'light-content'}
         animated={true}
-        translucent={false}
+        translucent={true}
       />
-      <View style={styles.arrowSearchBar}>
-        <Pressable onPress={() => navigation.goBack()}>
-          <Icon
-            name="arrow-left"
-            size={30}
-            color={theme == 'light' ? '#222' : '#fff'}
-          />
-        </Pressable>
-        <View style={styles.searchIconSearchBar}>
-          <Icon
-            name="magnifying-glass"
-            size={20}
-            color={theme == 'light' ? '#222' : '#fff'}
-            style={styles.searchIcon}
-          />
-          <View style={{flex: 1}}>
-            <TextInput
-              style={[
-                styles.searchBar,
-                {
-                  color: theme == 'light' ? '#222' : '#fff',
-                  backgroundColor:
-                    theme == 'light' ? 'rgba(0, 0, 0, 0.05)' : '#222',
-                },
-              ]}
-              placeholder="Search products..."
-              onChangeText={newText => setText(newText)}
-              defaultValue={text}
-              placeholderTextColor={theme == 'light' ? '#222' : '#fff'}
+      <View
+        style={{
+          backgroundColor: theme == 'light' ? '#fff' : '#111',
+          height: 110,
+          justifyContent: 'center',
+        }}>
+        <View style={styles.arrowSearchBar}>
+          <Pressable onPress={() => navigation.goBack()}>
+            <Icon
+              name="arrow-left"
+              size={30}
+              color={theme == 'light' ? '#222' : '#fff'}
             />
+          </Pressable>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              flex: 1,
+            }}>
+            <Icon
+              name="magnifying-glass"
+              size={20}
+              color={theme == 'light' ? '#222' : '#fff'}
+              style={{position: 'absolute', zIndex: 10, marginLeft: 10}}
+            />
+            <View style={{flex: 1}}>
+              <TextInput
+                style={[
+                  styles.searchBar,
+                  {
+                    borderColor: theme == 'light' ? '#222' : '#fff',
+                    color: theme == 'light' ? '#222' : '#fff',
+                  },
+                ]}
+                placeholder="Search..."
+                onChangeText={newText => setText(newText)}
+                defaultValue={text}
+                placeholderTextColor={theme == 'light' ? '#222' : '#fff'}
+              />
+            </View>
           </View>
         </View>
       </View>
@@ -141,12 +152,32 @@ const SearchScreen = ({navigation}) => {
 export default SearchScreen;
 
 const styles = StyleSheet.create({
+  // arrowSearchBar: {
+  //   flexDirection: 'row',
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  //   gap: 15,
+  //   padding: 20,
+  // },
+
   arrowSearchBar: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    width: '100%',
+    paddingTop: 25,
+    paddingHorizontal: 20,
+    gap: 20,
     alignItems: 'center',
-    gap: 15,
-    padding: 20,
+  },
+  searchBar: {
+    backgroundColor: 'transparent',
+    color: '#fff',
+    paddingLeft: 40,
+    fontSize: 20,
+    height: 50,
+    borderColor: '#fff',
+    borderWidth: 0.5,
+    borderRadius: 10,
+    padding: 10,
   },
 
   searchIconSearchBar: {
@@ -162,10 +193,10 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     zIndex: 10,
   },
-  searchBar: {
-    paddingLeft: 40,
-    fontSize: 20,
-    height: 53,
-    borderRadius: 10,
-  },
+  // searchBar: {
+  //   paddingLeft: 40,
+  //   fontSize: 20,
+  //   height: 53,
+  //   borderRadius: 10,
+  // },
 });

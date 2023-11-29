@@ -8,6 +8,8 @@ import ProductDisplay from './components/ProductDisplay';
 import ProductContextProvider from './context/ProductContextProvider';
 import Favourites from './components/Favourites';
 import Home from './components/mainScreens/Home';
+import RBSheet from 'react-native-raw-bottom-sheet';
+import CartDisplay from './components/CartDisplay';
 const Stack = createNativeStackNavigator();
 function App() {
   return (
@@ -27,11 +29,6 @@ function App() {
             component={ProductDisplay}
             options={{headerShown: false}}
           />
-          <Stack.Screen
-            name="cart"
-            component={Cart}
-            options={{headerShown: false}}
-          />
           {/* <Stack.Screen
             name="favourites"
             component={Favourites}
@@ -40,6 +37,7 @@ function App() {
         </Stack.Navigator>
       </NavigationContainer>
       {/* </GestureHandlerRootView> */}
+      {/* <CartDisplay /> */}
     </ProductContextProvider>
   );
 }

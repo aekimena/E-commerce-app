@@ -5,24 +5,16 @@ import {
   Pressable,
   TouchableOpacity,
   ScrollView,
-  Image,
+  StatusBar,
   Animated,
-  ImageBackground,
 } from 'react-native';
 import React, {useContext, useEffect, useRef, useState} from 'react';
-import {t} from 'react-native-tailwindcss';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import ProductContext from '../../context/ProductContext';
 
 const Home = ({navigation}) => {
-  const {
-    theme,
-    allProducts,
-    drawer,
-    favouriteItems,
-    newCollections,
-    setNewCollections,
-  } = useContext(ProductContext);
+  const {theme, allProducts, drawer, newCollections} =
+    useContext(ProductContext);
   const changeImageWH = useRef(new Animated.Value(0)).current;
   const [imgIndex, setImgIndex] = useState(0);
 
@@ -61,19 +53,18 @@ const Home = ({navigation}) => {
   return (
     <View
       style={{flex: 1, backgroundColor: theme == 'light' ? '#fff' : '#111'}}>
+      <StatusBar
+        translucent
+        backgroundColor={'transparent'}
+        barStyle={theme == 'light' ? 'dark-content' : 'light-content'}
+      />
       <View
         style={{
-          elevation: 3,
           backgroundColor: theme == 'light' ? '#fff' : '#111',
+          height: 110,
+          justifyContent: 'center',
         }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            paddingHorizontal: 20,
-            paddingVertical: 15,
-          }}>
+        <View style={styles.header}>
           <Pressable onPress={() => drawer.current.openDrawer()}>
             <Icon
               name="bars-staggered"
@@ -186,6 +177,13 @@ const Home = ({navigation}) => {
 export default Home;
 
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 25,
+  },
   imageContainer: {
     width: '100%',
     height: 250,

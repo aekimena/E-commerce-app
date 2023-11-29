@@ -56,6 +56,7 @@ const ProductContextProvider = ({children}) => {
   const [filteredNewCollections, setFilteredNewCollections] =
     useState(newCollections);
   const drawer = useRef(null);
+  const refRBSheet = useRef();
 
   const [theme, setTheme] = useState('light');
 
@@ -107,19 +108,54 @@ const ProductContextProvider = ({children}) => {
           favouriteItems.filter(item => item.id !== addedIem.id),
         );
   };
-  const handleNewQuantityValue = (id, newValue) => {
+  const handleAddQuantityValue = id => {
     setCartArray(prevData =>
       prevData.map(item =>
-        item.id === id ? {...item, quantity: newValue} : item,
+        item.id === id ? {...item, quantity: (item.quantity += 1)} : item,
       ),
     );
   };
-  const handleNewPriceValue = (id, newValue) => {
+
+  const handleMinusQuantityValue = id => {
     setCartArray(prevData =>
       prevData.map(item =>
-        item.id === id ? {...item, price: newValue} : item,
+        item.id === id ? {...item, quantity: (item.quantity -= 1)} : item,
       ),
     );
+  };
+  const handleAddPriceValue = id => {
+    setCartArray(prevData =>
+      prevData.map(item =>
+        item.id === id
+          ? {...item, price: (item.price += item.increaseAmount)}
+          : item,
+      ),
+    );
+  };
+
+  const handleMinusPriceValue = id => {
+    setCartArray(prevData =>
+      prevData.map(item =>
+        item.id === id
+          ? {...item, price: (item.price -= item.increaseAmount)}
+          : item,
+      ),
+    );
+  };
+
+  const handleAddBtn = item => {
+    item.quantity < item.stock
+      ? (handleAddQuantityValue(item.id), handleAddPriceValue(item.id))
+      : setCartArray(prevData =>
+          prevData.map(item => item.id == item.id && item),
+        );
+  };
+  const handleMinusBtn = item => {
+    item.quantity > 1
+      ? (handleMinusQuantityValue(item.id), handleMinusPriceValue(item.id))
+      : setCartArray(prevData =>
+          prevData.map(item => item.id == item.id && item),
+        );
   };
 
   const newRating = (id, rating) => {
@@ -189,18 +225,18 @@ const ProductContextProvider = ({children}) => {
     <ProductContext.Provider
       value={{
         productId,
-        // products,
+
         allProducts,
         setProductId,
-        // setProducts,
+
         cartUpdate,
         cartItems,
         setCartItems,
         cartArray,
         setCartArray,
         drawer,
-        handleNewQuantityValue,
-        handleNewPriceValue,
+        refRBSheet,
+
         handleNewFavouriteValue,
         favouriteItems,
         filteredProducts,
@@ -213,6 +249,8 @@ const ProductContextProvider = ({children}) => {
         toggleTheme,
         theme,
         setTheme,
+        handleAddBtn,
+        handleMinusBtn,
       }}>
       {children}
     </ProductContext.Provider>

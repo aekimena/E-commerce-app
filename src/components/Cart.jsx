@@ -4,7 +4,8 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  StatusBar,
+  Animated,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import React, {useContext, useEffect, useState, useRef} from 'react';
@@ -14,6 +15,7 @@ import Icon5 from 'react-native-vector-icons/FontAwesome5';
 import {t} from 'react-native-tailwindcss';
 import ProductContext from '../context/ProductContext';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
+import {RectButton} from 'react-native-gesture-handler';
 
 import {
   GestureHandlerRootView,
@@ -24,16 +26,17 @@ import {runOnJS} from 'react-native-reanimated';
 
 const Cart = ({navigation}) => {
   const {
-    allProducts,
     cartItems,
     setCartItems,
     cartArray,
     setCartArray,
-    handleNewValue,
+
     productId,
     setProductId,
-    handleNewQuantityValue,
-    handleNewPriceValue,
+
+    refRBSheet,
+    handleAddBtn,
+    handleMinusBtn,
     theme,
   } = useContext(ProductContext);
 
@@ -42,17 +45,13 @@ const Cart = ({navigation}) => {
   const [cartBgCol, setCartBgCol] = useState('transparent');
 
   const handleDisplayProduct = item => {
+    refRBSheet.current.close();
     setProductId(item.id);
     navigation.navigate('ProductDisplay');
   };
 
   useEffect(() => {
-    setTotalPrice(
-      cartArray
-        .map(item => item.price)
-        .reduce((x, y) => x + y, 0)
-        .toFixed(2),
-    );
+    setTotalPrice(cartArray.map(item => item.price).reduce((x, y) => x + y, 0));
     setTotalItem(
       cartArray.map(item => item.quantity).reduce((x, y) => x + y, 0),
     );
@@ -63,22 +62,7 @@ const Cart = ({navigation}) => {
     setCartArray([]);
   };
 
-  const handleAddBtn = item => {
-    item.quantity < item.stock
-      ? (handleNewQuantityValue(item.id, item.quantity + 1),
-        handleNewPriceValue(item.id, (item.price += item.increaseAmount)))
-      : null;
-  };
-  const handleMinusBtn = item => {
-    item.quantity > 1
-      ? (handleNewQuantityValue(item.id, item.quantity - 1),
-        handleNewPriceValue(item.id, (item.price -= item.increaseAmount)))
-      : null;
-  };
-
   const deleteItem = item => {
-    // handleNewValue(false, item.id);
-    // setCartArray(cartArray.filter(cart => cart.id !== item.id));
     cartItems.includes(item.id) &&
       setCartItems(cartItems.filter(cart => cart !== item.id));
     setCartArray(cartArray.filter(obj => obj.id !== item.id));
@@ -89,10 +73,7 @@ const Cart = ({navigation}) => {
       <View
         style={{
           flex: 1,
-          backgroundColor:
-            theme == 'light'
-              ? 'rgba(7, 23, 42, 0.02)'
-              : 'rgba(68, 68, 68, 0.2)',
+          backgroundColor: 'red',
 
           justifyContent: 'center',
         }}>
@@ -100,7 +81,7 @@ const Cart = ({navigation}) => {
           style={{
             paddingHorizontal: 30,
           }}>
-          <Icon name="trash" size={30} color="#555" />
+          <Icon name="trash" size={30} color="#000" />
         </View>
       </View>
     );
@@ -113,13 +94,6 @@ const Cart = ({navigation}) => {
       .onEnd(() => {
         runOnJS(handleDisplayProduct)(item);
       });
-  // .onEnd(() => {
-  //   runOnJS(setCartBgCol)('transparent');
-  // });
-
-  // const renderedCartItem = cartItem => {
-  //   return allProducts[allProducts.findIndex(obj => obj.id == cartItem)];
-  // };
 
   return (
     <GestureHandlerRootView
@@ -127,22 +101,11 @@ const Cart = ({navigation}) => {
         styles.container,
         {backgroundColor: theme == 'light' ? '#fff' : '#111'},
       ]}>
-      <StatusBar
-        backgroundColor={theme == 'light' ? '#fff' : '#111'}
-        barStyle={theme == 'light' ? 'dark-content' : 'light-content'}
-        animated={true}
-        translucent={false}
-      />
       <View style={styles.header}>
-        <Pressable
-          style={[
-            styles.topBtn,
-            {borderColor: theme == 'light' ? '#222' : '#fff'},
-          ]}
-          onPress={() => navigation.navigate('main')}>
+        <Pressable onPress={() => refRBSheet.current.close()}>
           <Icon
-            name="chevron-left"
-            size={20}
+            name="xmark"
+            size={25}
             color={theme == 'light' ? '#222' : '#fff'}
           />
         </Pressable>
@@ -152,15 +115,10 @@ const Cart = ({navigation}) => {
             Cart({totalItem})
           </Text>
         </View>
-        <Pressable
-          style={[
-            styles.topBtn,
-            {borderColor: theme == 'light' ? '#222' : '#fff'},
-          ]}
-          onPress={() => handleDeleteAll()}>
+        <Pressable onPress={() => handleDeleteAll()}>
           <Icon5
-            name="trash-alt"
-            size={20}
+            name="trash"
+            size={25}
             color={theme == 'light' ? '#222' : '#fff'}
           />
         </Pressable>
@@ -174,8 +132,6 @@ const Cart = ({navigation}) => {
         }}>
         <ScrollView showsVerticalScrollIndicator={false}>
           {cartArray?.length > 0 &&
-            // allProducts
-            //   .filter(item => cartItems.includes(item.id))
             cartArray.map(cartItem => (
               <Swipeable
                 renderLeftActions={renderLeftActions}
@@ -187,8 +143,10 @@ const Cart = ({navigation}) => {
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    backgroundColor:
-                      cartItem.id == productId ? cartBgCol : 'transparent',
+                    backgroundColor: theme == 'light' ? '#fff' : '#111',
+                    borderColor: '#222',
+                    borderTopWidth: 0.5,
+
                     gap: 15,
                     paddingVertical: 10,
                     paddingHorizontal: 20,
@@ -215,12 +173,6 @@ const Cart = ({navigation}) => {
 
                           flex: 1,
                         }}>
-                        {/* <Text
-                          style={{
-                            fontSize: 20,
-                            fontWeight: 500,
-                            color: theme == 'light' ? '#222' : '#fff',
-                          }} */}
                         <Text
                           style={{
                             color: theme == 'light' ? '#222' : '#fff',
@@ -238,7 +190,7 @@ const Cart = ({navigation}) => {
                             fontSize: 20,
                           }}>
                           <Icon name="naira-sign" size={15} />
-                          {cartItem.price.toFixed(2)}
+                          {cartItem.price}
                         </Text>
                         <Text
                           style={{
@@ -257,7 +209,6 @@ const Cart = ({navigation}) => {
                       justifyContent: 'center',
                       alignItems: 'center',
                       gap: 15,
-                      marginRight: 10,
                     }}>
                     <Pressable
                       style={[
@@ -308,42 +259,51 @@ const Cart = ({navigation}) => {
             ))}
         </ScrollView>
       </View>
-      <View style={styles.footer}>
-        <View>
-          <Text
-            style={{
-              color: theme == 'light' ? '#222' : '#fff',
-              fontSize: 17,
-              fontWeight: 500,
-            }}>
-            Total price
-          </Text>
-          <Text
-            style={{
-              fontSize: 30,
-              color: theme == 'light' ? '#222' : '#fff',
-              fontWeight: 'bold',
-            }}>
-            <Icon name="naira-sign" size={22} />
-            {totalPrice}
-          </Text>
-        </View>
-        <View
-          style={[
-            t.roundedFull,
-            {
-              paddingVertical: 16,
-              paddingHorizontal: 25,
-              backgroundColor: '#36346c',
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: 12,
-            },
-          ]}>
-          <Text style={{color: '#fff', fontSize: 20}}>Check Out</Text>
+      <View
+        style={{
+          backgroundColor: theme == 'light' ? '#fff' : '#111',
+          height: 90,
+          width: '100%',
+          justifyContent: 'center',
+          borderTopWidth: 0.5,
+          borderTopColor: '#111',
+          paddingHorizontal: 20,
+        }}>
+        <View style={styles.footer}>
           <View>
-            <Icon name="arrow-right" color="#fff" size={20} />
+            <Text
+              style={{
+                color: theme == 'light' ? '#222' : '#fff',
+                fontSize: 17,
+                fontWeight: 500,
+              }}>
+              Total price
+            </Text>
+            <Text
+              style={{
+                fontSize: 25,
+                color: theme == 'light' ? '#222' : '#fff',
+                fontWeight: 'bold',
+              }}>
+              <Icon name="naira-sign" size={15} />
+              {totalPrice}
+            </Text>
+          </View>
+          <View style={{flex: 1}}>
+            <TouchableOpacity>
+              <View
+                style={{
+                  backgroundColor: '#6236FF',
+                  width: '100%',
+                  paddingVertical: 15,
+                  borderRadius: 50,
+                }}>
+                <View style={styles.addToCartBtnFlexRow}>
+                  <Text style={{color: '#fff', fontSize: 20}}>Check Out</Text>
+                  <Icon name={'arrow-right'} size={25} color="#fff" />
+                </View>
+              </View>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -367,30 +327,23 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingHorizontal: 20,
   },
-  topBtn:
-    //   t.roundedFull,
-    //   t.flex,
-    //   t.justifyCenter,
-    //   t.itemsCenter,
-    {
-      backgroundColor: 'transparent',
-      height: 55,
-      width: 55,
-      justifyContent: 'center',
-      alignItems: 'center',
-      borderRadius: 27.5,
-      borderWidth: 1,
-      borderColor: '#07172a',
-    },
+  topBtn: {
+    backgroundColor: 'transparent',
+    height: 55,
+    width: 55,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 27.5,
+    borderWidth: 1,
+    borderColor: '#07172a',
+  },
 
   footer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+
     alignItems: 'center',
-    paddingVertical: 10,
-    // paddingTop: 5,
-    paddingHorizontal: 20,
-    // backgroundColor: '#000',
+
+    gap: 20,
   },
   addMinusBtn: {
     justifyContent: 'center',
@@ -399,5 +352,11 @@ const styles = StyleSheet.create({
     height: 23,
     width: 23,
     borderRadius: 8,
+  },
+  addToCartBtnFlexRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 10,
   },
 });

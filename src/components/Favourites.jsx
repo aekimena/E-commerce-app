@@ -38,67 +38,52 @@ const Favourites = ({navigation}) => {
         backgroundColor: theme == 'light' ? '#fff' : '#111',
       }}>
       <StatusBar
-        backgroundColor={theme == 'light' ? '#fff' : '#111'}
+        backgroundColor={'transparent'}
         barStyle={theme == 'light' ? 'dark-content' : 'light-content'}
         animated={true}
-        translucent={false}
+        translucent={true}
       />
       <View
         style={{
-          flexDirection: 'row',
+          backgroundColor: theme == 'light' ? '#fff' : '#111',
+          height: 110,
           justifyContent: 'center',
-          alignItems: 'center',
-          gap: 15,
-          // marginTop: 10,
-          padding: 20,
         }}>
-        <Pressable onPress={() => navigation.goBack()}>
-          <Icon
-            name="arrow-left"
-            size={30}
-            color={theme == 'light' ? '#222' : '#fff'}
-          />
-        </Pressable>
-        <View
-          style={[
-            t.flexRow,
-            t.justifyCenter,
-            t.itemsCenter,
-            t.relative,
-            {flex: 1},
-          ]}>
-          <Icon
-            name="magnifying-glass"
-            size={20}
-            color={theme == 'light' ? '#222' : '#fff'}
-            style={{
-              position: 'absolute',
-              marginTop: 10,
-              left: 0,
-              marginLeft: 10,
-              zIndex: 10,
-            }}
-          />
-          <View style={{flex: 1}}>
-            <TextInput
-              style={[
-                t.p3,
-                t.relative,
-                {
-                  backgroundColor:
-                    theme == 'light' ? 'rgba(0, 0, 0, 0.05)' : '#222',
-                  color: theme == 'light' ? '#222' : '#fff',
-                  paddingLeft: 40,
-                  fontSize: 20,
-                  height: 53,
-                  borderRadius: 10,
-                },
-              ]}
-              placeholder="Search favourites..."
-              onChangeText={newText => setText(newText)}
-              defaultValue={text}
-              placeholderTextColor={theme == 'light' ? '#222' : '#fff'}
+        <View style={styles.arrowSearchBar}>
+          <Pressable onPress={() => navigation.goBack()}>
+            <Icon
+              name="arrow-left"
+              size={30}
+              color={theme == 'light' ? '#222' : '#fff'}
             />
+          </Pressable>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              flex: 1,
+            }}>
+            <Icon
+              name="magnifying-glass"
+              size={20}
+              color={theme == 'light' ? '#222' : '#fff'}
+              style={{position: 'absolute', zIndex: 10, marginLeft: 10}}
+            />
+            <View style={{flex: 1}}>
+              <TextInput
+                style={[
+                  styles.searchBar,
+                  {
+                    borderColor: theme == 'light' ? '#222' : '#fff',
+                    color: theme == 'light' ? '#222' : '#fff',
+                  },
+                ]}
+                placeholder="Search..."
+                onChangeText={newText => setText(newText)}
+                defaultValue={text}
+                placeholderTextColor={theme == 'light' ? '#222' : '#fff'}
+              />
+            </View>
           </View>
         </View>
       </View>
@@ -117,7 +102,7 @@ const Favourites = ({navigation}) => {
               <Pressable
                 style={{
                   width: '50%',
-
+                  paddingHorizontal: 5,
                   marginBottom: 5,
                 }}
                 key={item.id}
@@ -128,8 +113,7 @@ const Favourites = ({navigation}) => {
                     style={{
                       width: '100%',
                       height: 200,
-                      borderTopLeftRadius: 8,
-                      borderTopRightRadius: 8,
+                      borderRadius: 0.1,
                     }}
                     resizeMode="contain"
                   />
@@ -146,7 +130,7 @@ const Favourites = ({navigation}) => {
                         allProducts[
                           allProducts.findIndex(obj => obj.id === item.id)
                         ].liked
-                          ? 'rgba(255, 37, 37, 0.6)'
+                          ? '#f66464'
                           : '#fff'
                       }
                       solid={
@@ -191,13 +175,11 @@ const Favourites = ({navigation}) => {
                       t.p2,
                       t.flexCol,
                       t.justifyBetween,
-                      t.roundedBLg,
-                      t.shadowMd,
+
                       {
-                        backgroundColor: theme == 'light' ? '#fff' : '#222',
+                        backgroundColor: 'transparent',
                         height: 'auto',
                         gap: 10,
-                        elevation: 1,
                       },
                       // t.itemsCenter,
                     ]}>
@@ -212,10 +194,12 @@ const Favourites = ({navigation}) => {
                     </Text>
                     <Text
                       style={{
-                        color: theme == 'light' ? '#222' : '#fff',
-                        fontSize: 17,
+                        color: theme == 'light' ? '#888' : '#999',
+                        fontWeight: 'bold',
+                        fontSize: 18,
                       }}>
-                      ${item.price.toFixed(2)}
+                      <Icon name="naira-sign" size={15} />
+                      {item.price}
                     </Text>
                   </View>
                 </View>
@@ -238,6 +222,25 @@ const styles = StyleSheet.create({
     gap: 10,
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  arrowSearchBar: {
+    flexDirection: 'row',
+    width: '100%',
+    paddingTop: 25,
+    paddingHorizontal: 20,
+    gap: 20,
+    alignItems: 'center',
+  },
+  searchBar: {
+    backgroundColor: 'transparent',
+    color: '#fff',
+    paddingLeft: 40,
+    fontSize: 20,
+    height: 50,
+    borderColor: '#fff',
+    borderWidth: 0.5,
+    borderRadius: 10,
+    padding: 10,
   },
   backBtn: {
     backgroundColor: 'transparent',

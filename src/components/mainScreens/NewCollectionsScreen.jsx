@@ -5,20 +5,15 @@ import {
   Image,
   Pressable,
   StatusBar,
-  Animated,
   ScrollView,
 } from 'react-native';
-import React, {useContext, useState, useEffect} from 'react';
+import React, {useContext, useState} from 'react';
 import ProductContext from '../../context/ProductContext';
 import {TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/FontAwesome6';
-import {t} from 'react-native-tailwindcss';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
-import Cart from '../Cart';
 
 const NewCollectionsScreen = ({navigation}) => {
   const [text, setText] = useState('');
-  // const [activeCategory, setActiveCategory] = useState('All');
   const [activeCategoryId, setActiveCategoryId] = useState(1);
 
   const {
@@ -30,9 +25,8 @@ const NewCollectionsScreen = ({navigation}) => {
     handleNewFavouriteValue,
     filteredNewCollections,
     cartItems,
-    setFilteredNewCollections,
   } = useContext(ProductContext);
-  const [activeBtn, setActiveBtn] = useState(1);
+  // const [activeBtn, setActiveBtn] = useState(1);
 
   const categories = [
     {id: 1, content: 'All'},
@@ -44,20 +38,18 @@ const NewCollectionsScreen = ({navigation}) => {
   ];
 
   const handlePress = id => {
-    // setActiveBtn(id);
-    // setActiveCategory(btnText);
     setActiveCategoryId(id);
   };
 
   const renderBtn = category => {
     const btnBg =
       activeCategoryId === category.id
-        ? '#36346C'
+        ? '#6236FF'
         : theme == 'light'
         ? '#222'
         : '#fff';
     const activeIndicator =
-      activeCategoryId === category.id ? '#36346c' : 'transparent';
+      activeCategoryId === category.id ? '#6236FF' : 'transparent';
     const activeFontWeight = activeCategoryId === category.id ? 'bold' : 500;
 
     return (
@@ -115,46 +107,61 @@ const NewCollectionsScreen = ({navigation}) => {
       style={{backgroundColor: theme == 'light' ? '#fff' : '#111', flex: 1}}>
       <StatusBar
         backgroundColor={'transparent'}
-        barStyle={'light-content'}
+        barStyle={theme == 'light' ? 'dark-content' : 'light-content'}
         animated={true}
         translucent={true}
       />
-
+      <View
+        style={{
+          backgroundColor: theme == 'light' ? '#fff' : '#111',
+          height: 110,
+          justifyContent: 'center',
+        }}>
+        <View style={styles.arrowSearchBar}>
+          <Pressable onPress={() => navigation.goBack()}>
+            <Icon
+              name="arrow-left"
+              size={30}
+              color={theme == 'light' ? '#222' : '#fff'}
+            />
+          </Pressable>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              flex: 1,
+            }}>
+            <Icon
+              name="magnifying-glass"
+              size={20}
+              color={theme == 'light' ? '#222' : '#fff'}
+              style={{position: 'absolute', zIndex: 10, marginLeft: 10}}
+            />
+            <View style={{flex: 1}}>
+              <TextInput
+                style={[
+                  styles.searchBar,
+                  {
+                    borderColor: theme == 'light' ? '#222' : '#fff',
+                    color: theme == 'light' ? '#222' : '#fff',
+                  },
+                ]}
+                placeholder="Search..."
+                onChangeText={newText => setText(newText)}
+                defaultValue={text}
+                placeholderTextColor={theme == 'light' ? '#222' : '#fff'}
+              />
+            </View>
+          </View>
+        </View>
+      </View>
       <ScrollView>
         <View
           style={{
             alignItems: 'center',
-            height: 350,
+            height: 200,
             width: '100%',
           }}>
-          <View style={styles.arrowSearchBar}>
-            <Pressable onPress={() => navigation.goBack()}>
-              <Icon name="arrow-left" size={30} color={'#fff'} />
-            </Pressable>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                flex: 1,
-              }}>
-              <Icon
-                name="magnifying-glass"
-                size={20}
-                color={'#fff'}
-                style={{position: 'absolute', zIndex: 10, marginLeft: 10}}
-              />
-              <View style={{flex: 1}}>
-                <TextInput
-                  style={styles.searchBar}
-                  placeholder="Search..."
-                  onChangeText={newText => setText(newText)}
-                  defaultValue={text}
-                  placeholderTextColor={'#fff'}
-                />
-              </View>
-            </View>
-          </View>
-
           <Image
             source={newCollections[0].imageSource}
             style={{height: '100%', width: '100%'}}
@@ -162,7 +169,9 @@ const NewCollectionsScreen = ({navigation}) => {
           />
           <View style={styles.layer}></View>
           <View style={styles.titleContainer}>
-            <Text style={styles.title}>New Collections</Text>
+            <Text style={[styles.title, {fontWeight: 300}]}>
+              New Collections
+            </Text>
           </View>
         </View>
         <View style={styles.selectorContainer}>
@@ -177,9 +186,8 @@ const NewCollectionsScreen = ({navigation}) => {
               style={[
                 styles.selector,
                 {
-                  elevation: theme == 'light' ? 2 : 0,
-                  backgroundColor: theme == 'light' ? '#fff' : 'transparent',
-                  borderWidth: theme == 'light' ? 0 : 0.5,
+                  elevation: 2,
+                  backgroundColor: theme == 'light' ? '#fff' : '#111',
                 },
               ]}
               onPress={dropDownPress}>
@@ -272,7 +280,7 @@ const NewCollectionsScreen = ({navigation}) => {
               <Pressable
                 style={{
                   width: '50%',
-
+                  paddingHorizontal: 5,
                   marginBottom: 5,
                 }}
                 key={product.id}
@@ -283,10 +291,9 @@ const NewCollectionsScreen = ({navigation}) => {
                     style={{
                       width: '100%',
                       height: 200,
-                      borderTopLeftRadius: 8,
-                      borderTopRightRadius: 8,
+                      borderRadius: 0.1,
                     }}
-                    resizeMode="contain"
+                    resizeMode="cover"
                   />
 
                   <Pressable
@@ -314,7 +321,7 @@ const NewCollectionsScreen = ({navigation}) => {
                         allProducts[
                           allProducts.findIndex(obj => obj.id == product.id)
                         ].liked
-                          ? 'rgba(255, 37, 37, 0.6)'
+                          ? '#f66464'
                           : '#fff'
                       }
                       solid={
@@ -349,10 +356,10 @@ const NewCollectionsScreen = ({navigation}) => {
 
                   <View
                     style={[
-                      t.roundedBLg,
+                      // t.roundedBLg,
                       styles.productInfoContainer,
                       {
-                        backgroundColor: theme == 'light' ? '#fff' : '#222',
+                        backgroundColor: 'transparent',
                       },
                     ]}>
                     <Text
@@ -364,12 +371,15 @@ const NewCollectionsScreen = ({navigation}) => {
                       lineBreakMode="tail">
                       {product.title}
                     </Text>
+
                     <Text
                       style={{
-                        color: theme == 'light' ? '#222' : '#fff',
-                        fontSize: 17,
+                        color: theme == 'light' ? '#888' : '#999',
+                        fontWeight: 'bold',
+                        fontSize: 18,
                       }}>
-                      ${product.price.toFixed(2)}
+                      <Icon name="naira-sign" size={15} />
+                      {product.price}
                     </Text>
                   </View>
                 </View>
@@ -388,9 +398,7 @@ const styles = StyleSheet.create({
   arrowSearchBar: {
     flexDirection: 'row',
     width: '100%',
-    position: 'absolute',
-    zIndex: 20,
-    paddingTop: 40,
+    paddingTop: 25,
     paddingHorizontal: 20,
     gap: 20,
     alignItems: 'center',
@@ -400,14 +408,14 @@ const styles = StyleSheet.create({
     color: '#fff',
     paddingLeft: 40,
     fontSize: 20,
-    height: 53,
+    height: 50,
     borderColor: '#fff',
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderRadius: 10,
     padding: 10,
   },
   layer: {
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
     height: '100%',
     width: '100%',
     position: 'absolute',
@@ -415,15 +423,12 @@ const styles = StyleSheet.create({
   titleContainer: {
     position: 'absolute',
     height: '100%',
-    alignSelf: 'flex-end',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
   },
   title: {
     color: '#fff',
     fontSize: 35,
     // fontWeight: 400,
-    textAlignVertical: 'bottom',
+    textAlignVertical: 'center',
     flex: 1,
   },
   selectorContainer: {

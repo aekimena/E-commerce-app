@@ -1,45 +1,44 @@
 import {
   View,
   Text,
-  SafeAreaView,
   Keyboard,
   StatusBar,
   StyleSheet,
   Pressable,
+  Dimensions,
   // DrawerLayoutAndroid,
 } from 'react-native';
 import React, {useState, useEffect, useContext, useRef} from 'react';
 import {t} from 'react-native-tailwindcss';
 import Icon from 'react-native-vector-icons/FontAwesome6';
-import Icon5 from 'react-native-vector-icons/FontAwesome5';
 
 import {useRoute, getFocusedRouteNameFromRoute} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
-import {
-  DrawerLayoutAndroid,
-  GestureHandlerRootView,
-} from 'react-native-gesture-handler';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+
 const MainStack = createNativeStackNavigator();
 
 import Home from './mainScreens/Home';
 // import Catalog from './mainScreens/Catalog';
 import Favourites from './Favourites';
+import CartDisplay from './CartDisplay';
 
 import ProductContext from '../context/ProductContext';
 import NewCollectionsScreen from './mainScreens/NewCollectionsScreen';
 import SearchScreen from './mainScreens/SearchScreen';
+import Cart from './Cart';
+import {runOnJS} from 'react-native-reanimated';
 
 const Main = ({navigation}) => {
   const [activeTab, setActiveTab] = useState(1);
-  const {cartItems, drawer, theme, favouriteItems, toggleTheme} =
+  const {cartItems, drawer, theme, favouriteItems, toggleTheme, refRBSheet} =
     useContext(ProductContext);
   const [keyboardStatus, setKeyboardStatus] = useState(false);
   const [settingsClicked, setSettingsClicked] = useState(false);
 
   const route = useRoute();
   const routeName = getFocusedRouteNameFromRoute(route);
-  // console.log(routeName);
 
   useEffect(() => {
     const showTab = Keyboard.addListener('keyboardDidShow', () => {
@@ -156,17 +155,7 @@ const Main = ({navigation}) => {
         renderNavigationView={renderDrawer}
         drawerBackgroundColor={theme == 'light' ? '#fff' : '#111'}
         onDrawerSlide={() => console.log('drawn')}
-        keyboardDismissMode="on-drag"
-        // gestureEnabled={gestureEnabled}
-        // drawerLockMode="unlocked"
-      >
-        {/* <View style={[t.hFull, t.flex, t.flexCol, t.justifyBetween]}> */}
-
-        {/* <View style={{flex: 1, justifyContent: 'center'}}> */}
-
-        {/* <ProductContextProvider> */}
-        {/* <Home navigation={navigation} /> */}
-
+        keyboardDismissMode="on-drag">
         <MainStack.Navigator initialRouteName="home">
           <MainStack.Screen
             name="home"
@@ -268,11 +257,11 @@ const Main = ({navigation}) => {
                   t.itemsCenter,
                   // t.p3,
                   {
-                    backgroundColor: '#36346C',
+                    backgroundColor: '#6236FF',
                     position: 'absolute',
-                    height: 7,
-                    width: 7,
-                    borderRadius: 3.5,
+                    height: 5,
+                    width: 5,
+                    borderRadius: 2.5,
                     top: -8.5,
                     right: -5,
                   },
@@ -298,7 +287,8 @@ const Main = ({navigation}) => {
           </Pressable>
 
           <Pressable
-            onPress={() => handleTapPress(3, navigation.navigate('cart'))}
+            // onPress={() => handleTapPress(3, navigation.navigate('cart'))}
+            onPress={() => refRBSheet.current.open()}
             style={{alignItems: 'center', justifyContent: 'center'}}>
             {cartItems?.length > 0 && (
               <View
@@ -308,11 +298,11 @@ const Main = ({navigation}) => {
                   t.itemsCenter,
                   // t.p3,
                   {
-                    backgroundColor: '#36346C',
+                    backgroundColor: '#6236FF',
                     position: 'absolute',
-                    height: 7,
-                    width: 7,
-                    borderRadius: 3.5,
+                    height: 5,
+                    width: 5,
+                    borderRadius: 2.5,
                     top: -8.5,
                     right: -5,
                   },
@@ -323,7 +313,7 @@ const Main = ({navigation}) => {
               size={27}
               color={
                 route.name == 'cart'
-                  ? '#36346C'
+                  ? '#6236FF'
                   : theme == 'light'
                   ? 'rgba(0, 0, 0, 0.25)'
                   : 'rgba(255, 255, 255, 0.2)'
@@ -347,8 +337,8 @@ const Main = ({navigation}) => {
             </View>
           </Pressable>
         </View>
-        {/* </View> */}
       </DrawerLayout>
+      <CartDisplay navigation={navigation} refRBSheet={refRBSheet} />
     </GestureHandlerRootView>
   );
 };
