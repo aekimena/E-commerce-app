@@ -1,13 +1,17 @@
+// this is the bottom sheet to dispay cart
+
 import {StyleSheet, Text, View, Dimensions} from 'react-native';
 import React, {useContext} from 'react';
-import Cart from './Cart';
+import Cart from '../screens/Cart';
 import RBSheet from 'react-native-raw-bottom-sheet';
-import ProductContext from '../context/ProductContext';
-const CartDisplay = ({navigation, refRBSheet}) => {
-  const {theme} = useContext(ProductContext);
+import {BottomSheet} from '../context/bottomSheetContext';
+import {Theme} from '../context/themeContext';
+const CartDisplay = () => {
+  const {theme} = useContext(Theme);
+  const {refRBSheetForCart} = useContext(BottomSheet);
   return (
     <RBSheet
-      ref={refRBSheet}
+      ref={refRBSheetForCart}
       closeOnDragDown={true}
       closeOnPressMask={true}
       animationType="slide"
@@ -21,12 +25,10 @@ const CartDisplay = ({navigation, refRBSheet}) => {
         },
         container: {
           backgroundColor: theme == 'light' ? '#fff' : '#111',
-          borderTopStartRadius: 20,
-          borderTopEndRadius: 20,
-          height: Dimensions.get('window').height,
+          height: Dimensions.get('window').height - 10,
         },
       }}>
-      <Cart navigation={navigation} />
+      <Cart />
     </RBSheet>
   );
 };
