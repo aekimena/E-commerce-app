@@ -1,3 +1,5 @@
+// context for app theme
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useRef, useState} from 'react';
 
@@ -29,6 +31,7 @@ const ThemeContext = ({children}) => {
     });
   };
 
+  // if you want to clear stuff from asyncstorage
   async function clearItem() {
     try {
       await AsyncStorage.removeItem('authToken');
@@ -44,8 +47,8 @@ const ThemeContext = ({children}) => {
       value={{
         theme,
         setTheme,
-        currentBgColor,
-        currentTextColor,
+        currentBgColor, // current background color
+        currentTextColor, // current text color
         loadTheme,
         toggleTheme,
         themeColor,
