@@ -1,3 +1,5 @@
+// context for general stuff
+
 import React, {useState, useRef, useEffect} from 'react';
 
 export const GeneralContext = React.createContext();
@@ -5,7 +7,6 @@ export const GeneralContext = React.createContext();
 const GeneralContextProvider = ({children}) => {
   const drawer = useRef(null);
 
-  const [modalVisible, setModalVisible] = useState(false);
 
   const [registeredEmail, setRegisteredEmail] = useState('');
 
@@ -13,8 +14,6 @@ const GeneralContextProvider = ({children}) => {
     <GeneralContext.Provider
       value={{
         drawer,
-        modalVisible,
-        setModalVisible,
         registeredEmail,
         setRegisteredEmail,
       }}>
