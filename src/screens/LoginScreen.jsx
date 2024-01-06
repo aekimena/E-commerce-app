@@ -193,7 +193,7 @@ const LoginScreen = () => {
                   navigation.replace('mainScreens');
                 }, 500);
               } else if (response.status == 202) {
-                // this shouldn't be here. this should be in another app
+                // this shouldn't be here. this should be in another app. this is to login admin
                 const data = await response.data;
                 await AsyncStorage.setItem('authToken', data.token);
                 setRegLoading(false);
