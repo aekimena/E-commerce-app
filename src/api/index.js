@@ -1,3 +1,5 @@
+// this is where all api requests are handled
+
 const express = require('express');
 const https = require('https');
 const mongoose = require('mongoose');
@@ -613,7 +615,7 @@ app.post('/orderConfirmation', async (req, res) => {
         order.statusForAdmin.deliveredBy = adminId;
         await order.save();
 
-        // increment the totalsales of the ordered products
+        // increment the totalsales of the ordered products. there should be a better way to do this. like count the total number of delivered products of a particular product and assign that number to its total sales.
         order.products.map(async obj => {
           const sameId = await Product.findOne({_id: obj._id});
           if (sameId) {
@@ -770,7 +772,7 @@ app.get('/sendMessage/:token/:userId/:type', async (req, res) => {
   }
 });
 
-// endpoint to refresh device token
+// endpoint to refresh device token if it changes
 
 app.post('/refreshToken', async (req, res) => {
   try {
