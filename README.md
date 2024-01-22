@@ -23,9 +23,6 @@ Communication is key, and Levon excels in keeping users informed through Firebas
 ![Screenshot_1704464486](https://github.com/aekimena/Levon-e-commerce-app/assets/129546723/d232f4cd-8e9b-44ac-bbc5-e7f13f825105)
 --
 ![Screenshot_1704453580](https://github.com/aekimena/Levon-e-commerce-app/assets/129546723/ba16a76a-cc74-412f-b676-1c299dda3385)
---
-![Screenshot_1704464724](https://github.com/aekimena/Levon-e-commerce-app/assets/129546723/b17f5a3e-65b9-4357-9894-196e3026a109)
---
-![Screenshot_1704464411](https://github.com/aekimena/Levon-e-commerce-app/assets/129546723/c6b74d48-90f2-4ec1-87ae-0c619339d4c0)
+
 
 
